@@ -14,6 +14,7 @@ int main(int argc, char **argv) {
     for (int i = 0; i < 10; i++) {
         top->a = i & 1; // 改变输入
         top->b = (i >> 1) & 1;
+        printf("%d\n",top->f);
         top->eval(); // 评估 Verilog 模块
 
         vcd->dump(i); // 记录波形
