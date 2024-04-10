@@ -1,28 +1,25 @@
-// Verilated -*- C++ -*-
+// Verilated -*- SystemC -*-
 // DESCRIPTION: Verilator output: Model implementation (design independent parts)
 
 #include "Vtop.h"
 #include "Vtop__Syms.h"
-#include "verilated_vcd_c.h"
+#include "verilated_vcd_sc.h"
 
 //============================================================
 // Constructors
 
-Vtop::Vtop(VerilatedContext* _vcontextp__, const char* _vcname__)
-    : VerilatedModel{*_vcontextp__}
-    , vlSymsp{new Vtop__Syms(contextp(), _vcname__, this)}
+Vtop::Vtop(sc_module_name /* unused */)
+    : vlSymsp{new Vtop__Syms(nullptr, name(), this)}
     , a{vlSymsp->TOP.a}
     , b{vlSymsp->TOP.b}
     , f{vlSymsp->TOP.f}
     , rootp{&(vlSymsp->TOP)}
 {
-    // Register model with the context
-    contextp()->addModel(this);
-}
+    // Sensitivities on all clocks and combinational inputs
+    SC_METHOD(eval);
+    sensitive << a;
+    sensitive << b;
 
-Vtop::Vtop(const char* _vcname__)
-    : Vtop(Verilated::threadContextp(), _vcname__)
-{
 }
 
 //============================================================
@@ -33,15 +30,27 @@ Vtop::~Vtop() {
 }
 
 //============================================================
-// Evaluation function
+// Evaluation loop
 
-#ifdef VL_DEBUG
-void Vtop___024root___eval_debug_assertions(Vtop___024root* vlSelf);
-#endif  // VL_DEBUG
-void Vtop___024root___eval_static(Vtop___024root* vlSelf);
 void Vtop___024root___eval_initial(Vtop___024root* vlSelf);
 void Vtop___024root___eval_settle(Vtop___024root* vlSelf);
 void Vtop___024root___eval(Vtop___024root* vlSelf);
+#ifdef VL_DEBUG
+void Vtop___024root___eval_debug_assertions(Vtop___024root* vlSelf);
+#endif  // VL_DEBUG
+void Vtop___024root___final(Vtop___024root* vlSelf);
+
+static void _eval_initial_loop(Vtop__Syms* __restrict vlSymsp) {
+    vlSymsp->__Vm_didInit = true;
+    Vtop___024root___eval_initial(&(vlSymsp->TOP));
+    // Evaluate till stable
+    vlSymsp->__Vm_activity = true;
+    do {
+        VL_DEBUG_IF(VL_DBG_MSGF("+ Initial loop\n"););
+        Vtop___024root___eval_settle(&(vlSymsp->TOP));
+        Vtop___024root___eval(&(vlSymsp->TOP));
+    } while (0);
+}
 
 void Vtop::eval_step() {
     VL_DEBUG_IF(VL_DBG_MSGF("+++++TOP Evaluate Vtop::eval_step\n"); );
@@ -49,59 +58,30 @@ void Vtop::eval_step() {
     // Debug assertions
     Vtop___024root___eval_debug_assertions(&(vlSymsp->TOP));
 #endif  // VL_DEBUG
+    // Initialize
+    if (VL_UNLIKELY(!vlSymsp->__Vm_didInit)) _eval_initial_loop(vlSymsp);
+    // Evaluate till stable
     vlSymsp->__Vm_activity = true;
-    vlSymsp->__Vm_deleter.deleteAll();
-    if (VL_UNLIKELY(!vlSymsp->__Vm_didInit)) {
-        vlSymsp->__Vm_didInit = true;
-        VL_DEBUG_IF(VL_DBG_MSGF("+ Initial\n"););
-        Vtop___024root___eval_static(&(vlSymsp->TOP));
-        Vtop___024root___eval_initial(&(vlSymsp->TOP));
-        Vtop___024root___eval_settle(&(vlSymsp->TOP));
-    }
-    // MTask 0 start
-    VL_DEBUG_IF(VL_DBG_MSGF("MTask0 starting\n"););
-    Verilated::mtaskId(0);
-    VL_DEBUG_IF(VL_DBG_MSGF("+ Eval\n"););
-    Vtop___024root___eval(&(vlSymsp->TOP));
+    do {
+        VL_DEBUG_IF(VL_DBG_MSGF("+ Clock loop\n"););
+        Vtop___024root___eval(&(vlSymsp->TOP));
+    } while (0);
     // Evaluate cleanup
-    Verilated::endOfThreadMTask(vlSymsp->__Vm_evalMsgQp);
-    Verilated::endOfEval(vlSymsp->__Vm_evalMsgQp);
-}
-
-//============================================================
-// Events and timing
-bool Vtop::eventsPending() { return false; }
-
-uint64_t Vtop::nextTimeSlot() {
-    VL_FATAL_MT(__FILE__, __LINE__, "", "%Error: No delays in the design");
-    return 0;
 }
 
 //============================================================
 // Utilities
 
-const char* Vtop::name() const {
-    return vlSymsp->name();
+VerilatedContext* Vtop::contextp() const {
+    return vlSymsp->_vm_contextp__;
 }
 
 //============================================================
 // Invoke final blocks
 
-void Vtop___024root___eval_final(Vtop___024root* vlSelf);
-
 VL_ATTR_COLD void Vtop::final() {
-    Vtop___024root___eval_final(&(vlSymsp->TOP));
+    Vtop___024root___final(&(vlSymsp->TOP));
 }
-
-//============================================================
-// Implementations of abstract methods from VerilatedModel
-
-const char* Vtop::hierName() const { return vlSymsp->name(); }
-const char* Vtop::modelName() const { return "Vtop"; }
-unsigned Vtop::threads() const { return 1; }
-std::unique_ptr<VerilatedTraceConfig> Vtop::traceConfig() const {
-    return std::unique_ptr<VerilatedTraceConfig>{new VerilatedTraceConfig{false, false, false}};
-};
 
 //============================================================
 // Trace configuration
@@ -127,11 +107,9 @@ VL_ATTR_COLD static void trace_init(void* voidSelf, VerilatedVcd* tracep, uint32
 VL_ATTR_COLD void Vtop___024root__trace_register(Vtop___024root* vlSelf, VerilatedVcd* tracep);
 
 VL_ATTR_COLD void Vtop::trace(VerilatedVcdC* tfp, int levels, int options) {
-    if (tfp->isOpen()) {
-        vl_fatal(__FILE__, __LINE__, __FILE__,"'Vtop::trace()' shall not be called after 'VerilatedVcdC::open()'.");
-    }
-    if (false && levels && options) {}  // Prevent unused
-    tfp->spTrace()->addModel(this);
+    if (!sc_core::sc_get_curr_simcontext()->elaboration_done()) {
+        vl_fatal(__FILE__, __LINE__, name(), "Vtop::trace() is called before sc_core::sc_start(). Run sc_core::sc_start(sc_core::SC_ZERO_TIME) before trace() to complete elaboration.");
+    }if (false && levels && options) {}  // Prevent unused
     tfp->spTrace()->addInitCb(&trace_init, &(vlSymsp->TOP));
     Vtop___024root__trace_register(&(vlSymsp->TOP), tfp->spTrace());
 }

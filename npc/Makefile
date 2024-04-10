@@ -1,48 +1,75 @@
-# Verilator Makefile 示例
+VSRC = $(wildcard ./vsrc/top.v)
+CSRC = $(wildcard ./csrc/sc_main.cpp)
 
-# Verilator 设置
+all:$(CSRC) $(VSRC)
+	verilator --sc --trace --exe -Wall $(CSRC) $(VSRC)
+	make -j -C obj_dir -f Vtop.mk Vtop
+	obj_dir/Vtop
+
+sim:$(CSRC) $(VSRC)
+	$(call git_commit, "sim RTL")
+	verilator --sc --trace --exe -Wall $(CSRC) $(VSRC)
+	make -j -C obj_dir -f Vtop.mk Vtop
+	obj_dir/Vtop
+	gtkwave wave.vcd
+	
+PROJ_PATH = $(shell pwd)
+DESIGN ?= gcd
+SDC_FILE ?= $(PROJ_PATH)/vsrc/gcd.sdc
+RTL_FILES ?= $(shell find $(PROJ_PATH)/vsrc -name "*.v")
+export CLK_FREQ_MHZ ?= 500
+RESULT_DIR = $(PROJ_PATH)/result/$(DESIGN)-$(CLK_FREQ_MHZ)MHz
+NETLIST_V  = $(RESULT_DIR)/$(DESIGN).netlist.v
+TIMING_RPT = $(RESULT_DIR)/$(DESIGN).rpt
+sta: $(TIMING_RPT)
+$(TIMING_RPT): $(SDC_FILE) $(NETLIST_V)
+	LD_LIBRARY_PATH=bin/ ./bin/iSTA $(PROJ_PATH)/sta.tcl $(DESIGN) $(SDC_FILE) $(NETLIST_V)
+	
+TOPNAME = top
+NXDC_FILES = constr/top.nxdc
+INC_PATH ?=
+
 VERILATOR = verilator
-VERILATOR_FLAGS = -Wall --cc --trace
+VERILATOR_CFLAGS += -MMD --build -cc  \
+				-O3 --x-assign fast --x-initial fast --noassert
 
-# 源文件路径
-VERILOG_SRC_DIR = vsrc
-CPP_SRC_DIR = csrc
+BUILD_DIR = ./build
+OBJ_DIR = $(BUILD_DIR)/obj_dir
+BIN = $(BUILD_DIR)/$(TOPNAME)
 
-# Verilog 源文件
-VERILOG_SRC = $(wildcard $(VERILOG_SRC_DIR)/*.v)
+default: $(BIN)
 
-# Verilator 生成的 C++ 对象目录
-OBJ_DIR = obj_dir
+$(shell mkdir -p $(BUILD_DIR))
 
-# 设置最终的可执行文件名称
-EXECUTABLE = sim
+# constraint file
+SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
+$(SRC_AUTO_BIND): $(NXDC_FILES)
+	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
 
-# Verilog 模块的顶层
-TOP_MODULE = top
+# project source
+VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
+CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*.cpp" | grep -v "sc_main.cpp")
 
-# 默认目标
-all: $(EXECUTABLE)
+CSRCS += $(SRC_AUTO_BIND)
 
-# 编译 Verilog 文件
-$(OBJ_DIR)/V$(TOP_MODULE)__ALL.a: $(VERILOG_SRC)
-	$(VERILATOR) $(VERILATOR_FLAGS) $(VERILOG_SRC) --exe $(wildcard $(CPP_SRC_DIR)/*.cpp)
-	make -C $(OBJ_DIR) -f V$(TOP_MODULE).mk
+# rules for NVBoard
+include $(NVBOARD_HOME)/scripts/nvboard.mk
 
-# 链接生成可执行文件
-$(EXECUTABLE): $(OBJ_DIR)/V$(TOP_MODULE)__ALL.a
-	g++ -o $(EXECUTABLE) $(OBJ_DIR)/V$(TOP_MODULE)__ALL.a $(VERILATOR_FLAGS)
+# rules for verilator
+INCFLAGS = $(addprefix -I, $(INC_PATH))
+CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
 
-# 清理目标
+$(BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
+	@rm -rf $(OBJ_DIR)
+	$(VERILATOR) $(VERILATOR_CFLAGS) \
+		--top-module $(TOPNAME) $^ \
+		$(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
+		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN))
+run: $(BIN)
+	@$^
+
+
+.PHONY: clean
 clean:
-	rm -rf $(OBJ_DIR) $(EXECUTABLE)
+	rm -rf obj_dir wave.vcd build
 
-# 额外的依赖关系
-.PHONY: all clean
-
-
-
-sim:
-	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
-	@echo "Write this Makefile by your self."
-
-include ../Makefile

@@ -1,35 +1,31 @@
-// Verilated -*- C++ -*-
+// Verilated -*- SystemC -*-
 // DESCRIPTION: Verilator output: Design internal header
 // See Vtop.h for the primary calling header
 
 #ifndef VERILATED_VTOP___024ROOT_H_
 #define VERILATED_VTOP___024ROOT_H_  // guard
 
+#include "systemc.h"
+#include "verilated_sc.h"
 #include "verilated.h"
 
 class Vtop__Syms;
-
-class Vtop___024root final : public VerilatedModule {
+VL_MODULE(Vtop___024root) {
   public:
 
     // DESIGN SPECIFIC STATE
-    VL_IN8(a,0,0);
-    VL_IN8(b,0,0);
-    VL_OUT8(f,0,0);
-    CData/*0:0*/ __VactContinue;
-    IData/*31:0*/ __VstlIterCount;
-    IData/*31:0*/ __VicoIterCount;
-    IData/*31:0*/ __VactIterCount;
-    VlTriggerVec<1> __VstlTriggered;
-    VlTriggerVec<1> __VicoTriggered;
-    VlTriggerVec<0> __VactTriggered;
-    VlTriggerVec<0> __VnbaTriggered;
+    CData/*0:0*/ __Vcellinp__top__b;
+    CData/*0:0*/ __Vcellinp__top__a;
+    VlUnpacked<CData/*0:0*/, 2> __Vm_traceActivity;
+    sc_in<bool> a;
+    sc_in<bool> b;
+    sc_out<bool> f;
 
     // INTERNAL VARIABLES
     Vtop__Syms* const vlSymsp;
 
     // CONSTRUCTORS
-    Vtop___024root(Vtop__Syms* symsp, const char* v__name);
+    Vtop___024root(Vtop__Syms* symsp, const char* name);
     ~Vtop___024root();
     VL_UNCOPYABLE(Vtop___024root);
 

@@ -1,6 +1,6 @@
-// Verilated -*- C++ -*-
+// Verilated -*- SystemC -*-
 // DESCRIPTION: Verilator output: Tracing implementation internals
-#include "verilated_vcd_c.h"
+#include "verilated_vcd_sc.h"
 #include "Vtop__Syms.h"
 
 
@@ -11,9 +11,6 @@ VL_ATTR_COLD void Vtop___024root__trace_init_sub__TOP__0(Vtop___024root* vlSelf,
     // Init
     const int c = vlSymsp->__Vm_baseCode;
     // Body
-    tracep->declBit(c+1,"a", false,-1);
-    tracep->declBit(c+2,"b", false,-1);
-    tracep->declBit(c+3,"f", false,-1);
     tracep->pushNamePrefix("top ");
     tracep->declBit(c+1,"a", false,-1);
     tracep->declBit(c+2,"b", false,-1);
@@ -38,8 +35,8 @@ VL_ATTR_COLD void Vtop___024root__trace_register(Vtop___024root* vlSelf, Verilat
     Vtop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root__trace_register\n"); );
     // Body
-    tracep->addFullCb(&Vtop___024root__trace_full_top_0, vlSelf);
-    tracep->addChgCb(&Vtop___024root__trace_chg_top_0, vlSelf);
+    tracep->addFullCb(&Vtop___024root__trace_full_top_0, vlSelf, nullptr);
+    tracep->addChgCb(&Vtop___024root__trace_chg_top_0, vlSelf, nullptr);
     tracep->addCleanupCb(&Vtop___024root__trace_cleanup, vlSelf);
 }
 
@@ -61,7 +58,8 @@ VL_ATTR_COLD void Vtop___024root__trace_full_sub_0(Vtop___024root* vlSelf, Veril
     // Init
     uint32_t* const oldp VL_ATTR_UNUSED = bufp->oldp(vlSymsp->__Vm_baseCode);
     // Body
-    bufp->fullBit(oldp+1,(vlSelf->a));
-    bufp->fullBit(oldp+2,(vlSelf->b));
-    bufp->fullBit(oldp+3,(vlSelf->f));
+    bufp->fullBit(oldp+1,(vlSelf->__Vcellinp__top__a));
+    bufp->fullBit(oldp+2,(vlSelf->__Vcellinp__top__b));
+    bufp->fullBit(oldp+3,(((IData)(vlSelf->__Vcellinp__top__a) 
+                           ^ (IData)(vlSelf->__Vcellinp__top__b))));
 }
