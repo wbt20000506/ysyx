@@ -72,6 +72,11 @@ static int cmd_info(char *args){
   printf("Please scanf reg or watchpoint needing to print\n");
   else if(*arg =='r')
   isa_reg_display();
+  else if(*arg=='w'){
+  //display_wp();
+  }
+  else
+  printf("Unknowm input\n");
   return 0;
 }
 
