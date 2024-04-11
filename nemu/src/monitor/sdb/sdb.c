@@ -18,6 +18,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "sdb.h"
+#include <memory/vaddr.h>
 
 static int is_batch_mode = false;
 
@@ -57,7 +58,7 @@ static int cmd_q(char *args) {
 static int cmd_si(char *args){
   char *arg = strtok(NULL, " ");
   if (arg==NULL)
-  cpu_exec(1);
+    cpu_exec(1);
   else{
     int i;
     sscanf(arg,"%d",&i);
@@ -69,17 +70,44 @@ static int cmd_si(char *args){
 static int cmd_info(char *args){
   char *arg = strtok(NULL, " ");
   if (arg==NULL)
-  printf("Please scanf reg or watchpoint needing to print\n");
+    printf("Please scanf reg or watchpoint needing to print\n");
   else if(*arg =='r')
-  isa_reg_display();
+    isa_reg_display();
   else if(*arg=='w'){
-  //display_wp();
+    //display_wp();
   }
   else
-  printf("Unknowm input\n");
+    printf("Unknowm input\n");
   return 0;
 }
 
+static int cmd_x(char *args){
+  char *arg = strtok(NULL, " ");
+  if (arg==NULL)
+    printf("Please scanf a number and a address\n");
+  else {
+    int i;
+    if(sscanf(arg,"%d",&i)==1){;
+    arg = strtok(NULL,"");
+    int m=0x00;
+    if(sscanf(arg,"%x",&m)==1){
+      for (int n = 0; n < i; n++)
+      {
+        word_t data = vaddr_read(m,4);
+        printf("0x%08x\t",data);
+        m=m+4;
+      }
+      printf("\n");
+      
+    }else{
+      printf("Unkonw input");
+    }
+    }else {
+      printf("Unkonw input");
+    }
+  }
+  return 0;
+}
 
 static int cmd_help(char *args);
 
@@ -92,7 +120,8 @@ static struct {
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
   { "si", "Step", cmd_si },
-  {"info","Print",cmd_info },
+  {"info","Print reg or watch",cmd_info },
+  {"x","Print memory",cmd_x},
   /* TODO: Add more commands */
 
 };
