@@ -91,11 +91,19 @@ static int cmd_x(char *args){
     arg = strtok(NULL,"");
     int m=0x00;
     if(sscanf(arg,"%x",&m)==1){
+      int count=0;
       for (int n = 0; n < i; n++)
       {
-        word_t data = vaddr_read(m,4);
-        printf("0x%08x\t",data);
-        m=m+4;
+        if(count==3){
+        printf("\n");
+        count=0;
+        }
+        else{
+          word_t data = vaddr_read(m,4);
+          printf("0x%08x\t",data);
+          m=m+4;
+          count++;
+        }
       }
       printf("\n");
       
