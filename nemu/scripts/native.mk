@@ -36,7 +36,7 @@ run-env: $(BINARY) $(DIFF_REF_SO)
 run: run-env
 	$(call git_commit, "run NEMU")
 ifeq ($(strip $(IMG)),)
-	
+	$(echo)
 else
 	$(BINARY) $(ARGS) $(IMG)
 endif
