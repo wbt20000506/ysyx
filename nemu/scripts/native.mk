@@ -35,10 +35,9 @@ run-env: $(BINARY) $(DIFF_REF_SO)
 
 run: run-env
 	$(call git_commit, "run NEMU")
-	ifneq ($(strip $(IMG)),)
-		$(NEMU_EXEC)
-	endif
-
+	if [ -n "$(IMG)" ]; then \
+		$(NEMU_EXEC); \
+	fi
 
 
 gdb: run-env
