@@ -69,7 +69,7 @@ static int cmd_si(char *args){
 static int cmd_info(char *args){
   char *arg = strtok(NULL, " ");
   if (arg==NULL)
-  printf("Please scanf reg or state needing to print ");
+  printf("Please scanf reg or state needing to print\n");
   else if(*arg =='r')
   isa_reg_display();
   return 0;
