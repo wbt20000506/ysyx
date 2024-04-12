@@ -97,12 +97,12 @@ static int cmd_x(char *args){
         printf("\n");
         count=0;
         }
-        else{
+        
           word_t data = vaddr_read(m,4);
           printf("0x%08x\t",data);
           m=m+4;
           count++;
-        }
+        
       }
       printf("\n");
     }else{
@@ -128,7 +128,7 @@ static struct {
   { "si", "Step", cmd_si },
   { "info","Print reg or watch",cmd_info },
   { "x","Print memory",cmd_x},
-  
+
   /* TODO: Add more commands */
 
 };
