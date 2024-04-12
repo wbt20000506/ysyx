@@ -21,7 +21,6 @@
 #include <memory/vaddr.h>
 
 static int is_batch_mode = false;
-
 void init_regex();
 void init_wp_pool();
 
@@ -106,12 +105,11 @@ static int cmd_x(char *args){
         }
       }
       printf("\n");
-      
     }else{
-      printf("Unkonw input");
+      printf("Unkonw input\n");
     }
     }else {
-      printf("Unkonw input");
+      printf("Unkonw input\n");
     }
   }
   return 0;
@@ -128,8 +126,9 @@ static struct {
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
   { "si", "Step", cmd_si },
-  {"info","Print reg or watch",cmd_info },
-  {"x","Print memory",cmd_x},
+  { "info","Print reg or watch",cmd_info },
+  { "x","Print memory",cmd_x},
+  
   /* TODO: Add more commands */
 
 };
