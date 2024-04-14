@@ -229,5 +229,6 @@ int find(int p,int q){
       }
     }
   }
+  Log("op:%d",n);
   return n;
 }
