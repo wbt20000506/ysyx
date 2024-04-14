@@ -158,7 +158,7 @@ word_t eval(int p,int q,bool *success){
       *success=false;
       return 0;
     }else{
-      int i;
+      word_t i;
       sscanf(tokens[p].str,"%d",&i);
       return i;
     }
