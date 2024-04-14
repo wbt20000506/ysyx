@@ -148,7 +148,7 @@ word_t expr(char *e, bool *success) {
 }
 
 word_t eval(int p,int q,bool *success){
-  if(tokens[p].type==TK_NOTYPE)
+  if(tokens[p].type==0)
   q--;
   Log("nr_token:%d",q);
   *success=true;
