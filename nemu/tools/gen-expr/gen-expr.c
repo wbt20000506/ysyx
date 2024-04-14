@@ -30,52 +30,57 @@ static char *code_format =
 "  printf(\"%%u\", result); "
 "  return 0; "
 "}";
-static int index_buf;
-int choose(int n)
-{
-	return rand() % n;
+static char *buf_start = NULL;
+static char *buf_end = buf+(sizeof(buf)/sizeof(buf[0]));
+
+static int choose(int n) {
+  return rand() % n;
 }
 
-
-static void gen(char c) {
-    if (index_buf < sizeof(buf) - 1) { // 确保有空间添加字符和结尾的'\0'
-        buf[index_buf++] = c;
+static void gen_space() {
+  int size = choose(4);
+  if (buf_start < buf_end) {
+    int n_writes = snprintf(buf_start, buf_end-buf_start, "%*s", size, "");
+    if (n_writes > 0) {
+      buf_start += n_writes;
     }
+  }
 }
 
 static void gen_num() {
-    if (index_buf < sizeof(buf) - 2) { // 确保至少有两个字符的空间
-        int num = rand() % 10;
-        buf[index_buf++] = '0' + num;
+  int num = choose(INT8_MAX);
+  if (buf_start < buf_end) {
+    int n_writes = snprintf(buf_start, buf_end-buf_start, "%d", num);
+    if (n_writes > 0) {
+      buf_start += n_writes;
     }
+  }
+  gen_space();
 }
 
-static void gen_rand_op() {
-    if (index_buf < sizeof(buf) - 2) { // 确保至少有两个字符的空间
-        char op[4] = {'+', '-', '*', '/'};
-        int pos = rand() % 4;
-        buf[index_buf++] = op[pos];
+static void gen_char(char c) {
+  int n_writes = snprintf(buf_start, buf_end-buf_start, "%c", c);
+  if (buf_start < buf_end) {
+    if (n_writes > 0) {
+      buf_start += n_writes;
     }
+  }
+}
+
+static char ops[] = {'+', '-', '*', '/'};
+static void gen_rand_op() {
+  int op_index = choose(sizeof(ops));
+  char op = ops[op_index];
+  gen_char(op);
 }
 
 static void gen_rand_expr() {
-    if (index_buf >= sizeof(buf) - 3) return; // 确保有足够空间至少添加一个操作符和括号
-
-    switch (choose(3)) {
-        case 0: gen_num(); break;
-        case 1: 
-            gen('('); 
-            if (index_buf < sizeof(buf) - 3) { // 检查添加左括号后是否还有空间继续
-                gen_rand_expr(); 
-                gen(')'); 
-            }
-            break;
-        default: 
-            gen_rand_expr(); 
-            gen_rand_op(); 
-            gen_rand_expr(); 
-            break;
-    }
+  switch (choose(3))
+  {
+  case 0: gen_num(); break;
+  case 1: gen_char('('); gen_rand_expr(); gen_char(')'); break;
+  default: gen_rand_expr(); gen_rand_op(); gen_rand_expr(); break;
+  }
 }
 
 int main(int argc, char *argv[]) {
@@ -87,8 +92,11 @@ int main(int argc, char *argv[]) {
   }
   int i;
   for (i = 0; i < loop; i ++) {
+    buf_start = buf;
+    
     gen_rand_expr();
     
+
     sprintf(code_buf, code_format, buf);
 
     FILE *fp = fopen("/tmp/.code.c", "w");
@@ -96,19 +104,19 @@ int main(int argc, char *argv[]) {
     fputs(code_buf, fp);
     fclose(fp);
 
-    int ret = system("gcc -Wall -Werror /tmp/.code.c -o /tmp/.expr");
+    int ret = system("gcc /tmp/.code.c -Wall -Werror -o /tmp/.expr");
+    // filter div-by-zero expressions
     if (ret != 0) continue;
 
     fp = popen("/tmp/.expr", "r");
     assert(fp != NULL);
 
-    int result;
-    ret = fscanf(fp, "%d", &result);
+    uint64_t result;
+    int _ = fscanf(fp, "%lu", &result);
+    _ = _;
     pclose(fp);
-
-    printf("%u %s\n", result, buf);
-    index_buf=0;
-    buf[index_buf] = '\0';
+    
+    printf("%lu %s\n", result, buf);
   }
   return 0;
 }
