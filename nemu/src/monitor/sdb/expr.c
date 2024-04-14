@@ -171,7 +171,7 @@ word_t eval(int p,int q,bool *success){
     int op=find(p,q);
     word_t val1=eval(p,op-1,success);
     word_t val2=eval(op+1,q,success);
-    switch (op)
+    switch (tokens[op].type)
     {
     case TK_PLUS:return val1+val2;
     case TK_MINUS:return val1-val2;
@@ -203,6 +203,7 @@ bool check_parentheses(int p,int q){
 }
 
 int find(int p,int q){
+  int n=0;
   int m=0;
   for(int i=p;i<q;i++){
     if(tokens[i].type==TK_NUM){
@@ -210,9 +211,11 @@ int find(int p,int q){
     }else if(tokens[i].type!=TK_LPAREN&&tokens[i].type!=TK_RPAREN){
       if(m==0){
         m=tokens[i].type;
+        n=i;
       }else{
         if(tokens[i].type<=m){
           m=tokens[i].type;
+          n=i;
         }
       }
     }
@@ -226,6 +229,6 @@ int find(int p,int q){
       }
     }
   }
-  Log("op:%d",m);
-  return m;
+  Log("op:%d",n);
+  return n;
 }
