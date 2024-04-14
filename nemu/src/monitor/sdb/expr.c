@@ -119,11 +119,11 @@ static bool make_token(char *e) {
           case TK_NUM:tokens[nr_token].type = TK_NUM;
                       strncpy(tokens[nr_token].str,substr_start,substr_len);
                       tokens[nr_token].str[substr_len]='\0';break;
-          default:Log("error");
+          default:printf("error\n");
         }
         nr_token++;
         break;
-        Log("tokens[%d].type=%d,tokens[%d].str=%s,",nr_token,tokens[nr_token].type,nr_token,tokens[nr_token].str);
+        printf("tokens[%d].type=%d,tokens[%d].str=%s\n",nr_token,tokens[nr_token].type,nr_token,tokens[nr_token].str);
       }
     }
 
