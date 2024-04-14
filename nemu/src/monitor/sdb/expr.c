@@ -116,9 +116,9 @@ static bool make_token(char *e) {
           case '/':tokens[nr_token].type = TK_DIV;break;
           case '(':tokens[nr_token].type = TK_LPAREN;break;
           case ')':tokens[nr_token].type = TK_RPAREN;break;
-          case TK_NUM:tokens[nr_token].type = TK_NUM;
+          case TK_NUM:{tokens[nr_token].type = TK_NUM;
                       strncpy(tokens[nr_token].str,substr_start,substr_len);
-                      tokens[nr_token].str[substr_len]='\0';break;
+                      tokens[nr_token].str[substr_len]='\0';break;}
           default:Log("error");
         }
         Log("tokens[%d].type=%d,tokens[%d].str=%s",nr_token,tokens[nr_token].type,nr_token,tokens[nr_token].str);
