@@ -51,7 +51,7 @@ static struct rule {
   {"\\/", '/'},          // division
   {"\\(", '('},          // left parenthesis
   {"\\)", ')'},          // right parenthesis
-  {"\\d+", TK_NUM},      // numbers
+  {"\\b", TK_NUM},      // numbers
   {"==", TK_EQ},         // equal
 };
 
