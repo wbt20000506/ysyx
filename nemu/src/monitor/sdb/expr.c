@@ -109,7 +109,7 @@ static bool make_token(char *e) {
          */
 
         switch (rules[i].token_type) {
-          case TK_NOTYPE:break;
+          case TK_NOTYPE:nr_token--;break;
           case '*':tokens[nr_token].type = TK_MUL;break;
           case '+':tokens[nr_token].type = TK_PLUS;break;
           case '-':tokens[nr_token].type = TK_MINUS;break;
