@@ -119,7 +119,7 @@ static int cmd_p(char *args){
   bool success;
   word_t data=expr(args,&success);
   printf("%s=%u\n",args,data);
-  return 0;
+  return success;
 }
 
 static int cmd_help(char *args);
