@@ -148,6 +148,7 @@ word_t expr(char *e, bool *success) {
 }
 
 word_t eval(int p,int q,bool *success){
+  Log("nr_token:%d",q);
   *success=true;
   if(p>q){
     *success=false;
