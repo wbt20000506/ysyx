@@ -203,7 +203,6 @@ bool check_parentheses(int p,int q){
 }
 
 int find(int p,int q){
-  int n=0;
   int m=0;
   for(int i=p;i<q;i++){
     if(tokens[i].type==TK_NUM){
@@ -211,11 +210,9 @@ int find(int p,int q){
     }else if(tokens[i].type!=TK_LPAREN&&tokens[i].type!=TK_RPAREN){
       if(m==0){
         m=tokens[i].type;
-        n=i;
       }else{
         if(tokens[i].type<=m){
           m=tokens[i].type;
-          n=i;
         }
       }
     }
@@ -229,6 +226,6 @@ int find(int p,int q){
       }
     }
   }
-  Log("op:%d",n);
-  return n;
+  Log("op:%d",m);
+  return m;
 }
