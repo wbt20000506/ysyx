@@ -115,6 +115,13 @@ static int cmd_x(char *args){
   return 0;
 }
 
+static int cmd_p(char *args){
+  bool success;
+  word_t data=expr(args,&success);
+  printf("%s=%u\n",args,data);
+  return 0;
+}
+
 static int cmd_help(char *args);
 
 static struct {
@@ -128,6 +135,7 @@ static struct {
   { "si", "Step", cmd_si },
   { "info","Print reg or watch",cmd_info },
   { "x","Print memory",cmd_x},
+  { "p","Compute",cmd_p},
 
   /* TODO: Add more commands */
 

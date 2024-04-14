@@ -19,12 +19,20 @@
  * Type 'man regex' for more information about POSIX regex functions.
  */
 #include <regex.h>
-
+bool check_parentheses(int p, int q);
+int find(int p, int q);
+word_t eval(int p, int q, bool *success);
 enum {
-  TK_NOTYPE = 256, TK_EQ,
-
+  TK_NOTYPE = 256,  // space
+  TK_EQ,            // 等于运算符 "=="
+  TK_NUM,           // 数字
+  TK_PLUS,          // 加号 "+"
+  TK_MINUS,         // 减号 "-"
+  TK_MUL,           // 乘号 "*"
+  TK_DIV,           // 除号 "/"
+  TK_LPAREN,        // 左括号 "("
+  TK_RPAREN,        // 右括号 ")"
   /* TODO: Add more token types */
-
 };
 
 static struct rule {
@@ -36,9 +44,15 @@ static struct rule {
    * Pay attention to the precedence level of different rules.
    */
 
-  {" +", TK_NOTYPE},    // spaces
-  {"\\+", '+'},         // plus
-  {"==", TK_EQ},        // equal
+  {" +", TK_NOTYPE},     // spaces
+  {"\\+", '+'},          // plus
+  {"\\-", '-'},          // subtraction
+  {"\\*", '*'},          // multiplication
+  {"\\/", '/'},          // division
+  {"\\(", '('},          // left parenthesis
+  {"\\)", ')'},          // right parenthesis
+  {"\\d+", TK_NUM},      // numbers
+  {"==", TK_EQ},         // equal
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -95,9 +109,18 @@ static bool make_token(char *e) {
          */
 
         switch (rules[i].token_type) {
-          default: TODO();
+          case TK_NOTYPE:break;
+          case '*':tokens[nr_token].type = TK_MUL;break;
+          case '+':tokens[nr_token].type = TK_PLUS;break;
+          case '-':tokens[nr_token].type = TK_MINUS;break;
+          case '/':tokens[nr_token].type = TK_DIV;break;
+          case '(':tokens[nr_token].type = TK_LPAREN;break;
+          case ')':tokens[nr_token].type = TK_RPAREN;break;
+          case TK_NUM:tokens[nr_token].type = TK_NUM;
+                      strncpy(tokens[nr_token].str,substr_start,substr_len);
+                      tokens[nr_token].str[substr_len]='\0';break;
         }
-
+        nr_token++;
         break;
       }
     }
@@ -118,8 +141,90 @@ word_t expr(char *e, bool *success) {
     return 0;
   }
 
-  /* TODO: Insert codes to evaluate the expression. */
-  TODO();
+  return eval(0,nr_token,success);
+}
 
-  return 0;
+word_t eval(int p,int q,bool *success){
+  *success=true;
+  if(p>q){
+    *success=true;
+    return 0;
+  }
+  else if(p==q){
+    if(tokens[p].type!=TK_NUM){
+      *success=false;
+      return 0;
+    }else{
+      int i;
+      sscanf(tokens[p].str,"%d",&i);
+      return i;
+    }
+  }
+  else if(check_parentheses(p,q)==true)
+  {
+    return eval(p+1,q-1,success);
+  }
+  else{
+    int op=find(p,q);
+    word_t val1=eval(p,op-1,success);
+    word_t val2=eval(op+1,q,success);
+    switch (op)
+    {
+    case TK_PLUS:return val1+val2;
+    case TK_MINUS:return val1-val2;
+    case TK_MUL:return val1*val2;
+    case TK_DIV:return val1/val2;
+    default:assert(0);
+    }
+  }
+}
+
+bool check_parentheses(int p,int q){
+  if(tokens[p].type==TK_LPAREN&&tokens[q].type==TK_RPAREN){
+    int n=1,m=1;
+    for(int i=p;i<q;i++){
+      if(tokens[i].type==TK_LPAREN){
+        n++;
+      }
+      if (tokens[i].type==TK_RPAREN)
+      {
+        m++;
+      }
+      if(n<m){
+        return false;
+      }
+    }
+    return true;
+  }else
+  return false;
+}
+
+int find(int p,int q){
+  int n=0;
+  int m=0;
+  for(int i=p;i<q;i++){
+    if(tokens[i].type==TK_NUM){
+      continue;
+    }else if(tokens[i].type!=TK_LPAREN&&tokens[i].type!=TK_RPAREN){
+      if(m==0){
+        m=tokens[i].type;
+        n=i;
+      }else{
+        if(tokens[i].type<=m){
+          m=tokens[i].type;
+          n=i;
+        }
+      }
+    }
+    else if (tokens[i].type==TK_LPAREN)
+    {
+      while (true)
+      {
+        i++;
+        if(tokens[i].type==TK_RPAREN)
+        break;
+      }
+    }
+  }
+  return n;
 }

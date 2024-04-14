@@ -30,9 +30,52 @@ static char *code_format =
 "  printf(\"%%u\", result); "
 "  return 0; "
 "}";
+static int index_buf;
+int choose(int n)
+{
+	return rand() % n;
+}
+
+
+static void gen(char c) {
+    if (index_buf < sizeof(buf) - 1) { // 确保有空间添加字符和结尾的'\0'
+        buf[index_buf++] = c;
+    }
+}
+
+static void gen_num() {
+    if (index_buf < sizeof(buf) - 2) { // 确保至少有两个字符的空间
+        int num = rand() % 10;
+        buf[index_buf++] = '0' + num;
+    }
+}
+
+static void gen_rand_op() {
+    if (index_buf < sizeof(buf) - 2) { // 确保至少有两个字符的空间
+        char op[4] = {'+', '-', '*', '/'};
+        int pos = rand() % 4;
+        buf[index_buf++] = op[pos];
+    }
+}
 
 static void gen_rand_expr() {
-  buf[0] = '\0';
+    if (index_buf >= sizeof(buf) - 3) return; // 确保有足够空间至少添加一个操作符和括号
+
+    switch (choose(3)) {
+        case 0: gen_num(); break;
+        case 1: 
+            gen('('); 
+            if (index_buf < sizeof(buf) - 3) { // 检查添加左括号后是否还有空间继续
+                gen_rand_expr(); 
+                gen(')'); 
+            }
+            break;
+        default: 
+            gen_rand_expr(); 
+            gen_rand_op(); 
+            gen_rand_expr(); 
+            break;
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -45,7 +88,7 @@ int main(int argc, char *argv[]) {
   int i;
   for (i = 0; i < loop; i ++) {
     gen_rand_expr();
-
+    
     sprintf(code_buf, code_format, buf);
 
     FILE *fp = fopen("/tmp/.code.c", "w");
@@ -53,7 +96,7 @@ int main(int argc, char *argv[]) {
     fputs(code_buf, fp);
     fclose(fp);
 
-    int ret = system("gcc /tmp/.code.c -o /tmp/.expr");
+    int ret = system("gcc -Wall -Werror /tmp/.code.c -o /tmp/.expr");
     if (ret != 0) continue;
 
     fp = popen("/tmp/.expr", "r");
@@ -64,6 +107,8 @@ int main(int argc, char *argv[]) {
     pclose(fp);
 
     printf("%u %s\n", result, buf);
+    index_buf=0;
+    buf[index_buf] = '\0';
   }
   return 0;
 }

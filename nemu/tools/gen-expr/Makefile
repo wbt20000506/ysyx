@@ -15,4 +15,9 @@
 
 NAME = gen-expr
 SRCS = gen-expr.c
-include $(NEMU_HOME)/scripts/build.mk
+all:$(SRCS)
+	gcc -Wall -Werror $(SRCS) -o $(NAME)
+run:$(NAME)
+	./$(NAME) 100 > input
+clean:
+	rm input $(NAME)
