@@ -119,6 +119,7 @@ static bool make_token(char *e) {
           case TK_NUM:tokens[nr_token].type = TK_NUM;
                       strncpy(tokens[nr_token].str,substr_start,substr_len);
                       tokens[nr_token].str[substr_len]='\0';break;
+          default:Log("error");
         }
         nr_token++;
         break;
