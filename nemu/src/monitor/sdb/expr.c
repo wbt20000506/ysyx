@@ -229,6 +229,6 @@ int find(int p,int q){
       }
     }
   }
-  Log("op:%d",n);
+  Log("op:%d,type:%d",n,tokens[n].type);
   return n;
 }
