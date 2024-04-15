@@ -210,7 +210,7 @@ void sdb_mainloop() {
 
 static void test_expr(){
   FILE *file;
-  char filename[]="/home/parallels/ysyx-workbench/nemu/tools/gen-expr/input";
+  char filename[]="/home/parallels/ysyx-workbench/nemu/tools/gen-expr/input1";
   char line[65536];
   file=fopen(filename,"r");
   if (file == NULL)
@@ -226,7 +226,7 @@ static void test_expr(){
     Log("%s=%s",result,expr);
     
     if(line[0]=='o')
-    continue;
+    break;
     else{
       int resu;
       sscanf(result,"%d",&resu);
