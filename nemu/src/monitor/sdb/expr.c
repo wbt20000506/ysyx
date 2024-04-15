@@ -190,7 +190,7 @@ word_t eval(int p,int q,bool *success){
 
 bool check_parentheses(int p,int q){
   if(tokens[p].type==TK_LPAREN&&tokens[q].type==TK_RPAREN){
-    int n=1,m=1;
+    int n=0,m=1;
     for(int i=p;i<q;i++){
       if(tokens[i].type==TK_LPAREN){
         n++;
