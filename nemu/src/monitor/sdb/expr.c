@@ -174,7 +174,7 @@ word_t eval(int p,int q,bool *success){
   else{
     int op=find(p,q);
     word_t val1=eval(p,op-1,success);
-    assert(0);
+    
     word_t val2=eval(op+1,q,success);
     
     switch (tokens[op].type)
