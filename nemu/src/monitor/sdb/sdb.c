@@ -209,7 +209,6 @@ void sdb_mainloop() {
 }
 
 static void test_expr(){
-  Log("123");
   FILE *file;
   char filename[]="/home/parallels/ysyx-workbench/nemu/tools/gen-expr/input";
   char line[65536];
@@ -219,10 +218,12 @@ static void test_expr(){
     Log("Open filr error");
   }
   while (fgets(line,sizeof(line),file)!=NULL)
-  { int t=strlen(line)-1;
+  { 
+    int t=strlen(line)-1;
     line[t]='\0';
     char *result = strtok(line,"");
     char *expr = strtok(NULL,"");
+    Log("%s=%s",result,expr);
     if(line[0]=='o')
     break;
     else{
