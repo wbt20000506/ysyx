@@ -229,6 +229,8 @@ static void test_expr(){
     else{
       int resu;
       sscanf(result,"%d",&resu);
+      Log("%d",resu);
+      assert(0);
       if (resu>65530)
       
         continue;
