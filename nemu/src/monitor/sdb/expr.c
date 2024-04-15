@@ -168,7 +168,7 @@ word_t eval(int p,int q,bool *success){
   }
   else if(check_parentheses(p,q)==true)
   {
-    Log("p:%d,q:%d",p,q);
+    
     return eval(p+1,q-1,success);
   }
   else{
@@ -189,6 +189,7 @@ word_t eval(int p,int q,bool *success){
 }
 
 bool check_parentheses(int p,int q){
+  Log("p:%d,q:%d",p,q);
   if(tokens[p].type==TK_LPAREN&&tokens[q].type==TK_RPAREN){
     int n=0,m=1;
     for(int i=p;i<q;i++){
