@@ -205,6 +205,9 @@ bool check_parentheses(int p,int q){
       }
       Log("n:%d,m:%d,i:%d",n,m,i);
     }
+    if(n!=m){
+      return false;
+    }else
     return true;
   }else
   return false;
