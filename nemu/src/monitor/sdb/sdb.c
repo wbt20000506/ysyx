@@ -220,16 +220,16 @@ static void test_expr(){
   while (fgets(line,sizeof(line),file)!=NULL)
   { int t=strlen(line)-1;
     line[t]='\0';
+    char *result = strtok(line,"");
+    char *expr = strtok(NULL,"");
     if(line[0]=='o')
     break;
     else{
-      int data;
-      char *avgr=line+1;
-      data=cmd_p(avgr);
-      char *da;
-      sprintf(da,"%d",data);
-      if(data==line[0])
-        Log("pass");
+      int data=cmd_p(expr);
+      int resu;
+      sscanf(result,"%d",&resu);
+      if(data==resu)
+      Log("pass");
     }
   }
   fclose(file);
