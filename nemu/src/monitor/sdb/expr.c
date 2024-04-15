@@ -150,7 +150,7 @@ word_t expr(char *e, bool *success) {
 word_t eval(int p,int q,bool *success){
   if(tokens[p].type==TK_NOTYPE)
   p++;
-  Log("p:%d,q:%d",p,q);
+  //Log("p:%d,q:%d",p,q);
   *success=true;
   if(p>q){
     *success=false;
@@ -236,7 +236,7 @@ int find(int p,int q){
     }
   }
   
-  //Log("op:%d,type:%d",n,tokens[n].type);
+  Log("op:%d,type:%d",n,tokens[n].type);
   
   return n;
 }
