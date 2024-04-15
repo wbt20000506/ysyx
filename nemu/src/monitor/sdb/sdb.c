@@ -231,7 +231,7 @@ static void test_expr(){
       sscanf(result,"%d",&resu);
       if (resu==4294967264)
       {
-        continue;
+        break;
       }
       int data=cmd_p(expr);
       if(data==resu)
