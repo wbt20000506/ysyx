@@ -226,7 +226,7 @@ static void test_expr(){
     Log("%s=%s",result,expr);
     
     if(line[0]=='o')
-    break;
+    continue;
     else{
       int resu;
       sscanf(result,"%d",&resu);
