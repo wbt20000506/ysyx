@@ -230,9 +230,9 @@ static void test_expr(){
       int resu;
       sscanf(result,"%d",&resu);
       if (resu==4294967264)
-      {
+      
         break;
-      }
+      
       int data=cmd_p(expr);
       if(data==resu)
       Log("pass");
