@@ -121,7 +121,7 @@ static bool make_token(char *e) {
                       tokens[nr_token].str[substr_len]='\0';break;}
           default:Log("error");
         }
-        //Log("tokens[%d].type=%d,tokens[%d].str=%s",nr_token,tokens[nr_token].type,nr_token,tokens[nr_token].str);
+        Log("tokens[%d].type=%d,tokens[%d].str=%s",nr_token,tokens[nr_token].type,nr_token,tokens[nr_token].str);
         nr_token++;
         break;
         
