@@ -109,7 +109,7 @@ static bool make_token(char *e) {
          */
         
         switch (rules[i].token_type) {
-          case TK_NOTYPE:{if (nr_token==0)break; else {nr_token--; break;}}
+          case TK_NOTYPE:{if (nr_token==0){tokens[nr_token].type = TK_NOTYPE;break;} else {nr_token--; break;}}
           case '*':tokens[nr_token].type = TK_MUL;break;
           case '+':tokens[nr_token].type = TK_PLUS;break;
           case '-':tokens[nr_token].type = TK_MINUS;break;
@@ -148,7 +148,7 @@ word_t expr(char *e, bool *success) {
 }
 
 word_t eval(int p,int q,bool *success){
-  if(tokens[p].type==0)
+  if(tokens[p].type==TK_NOTYPE)
   p++;
   Log("nr_token:%d",q);
   *success=true;
