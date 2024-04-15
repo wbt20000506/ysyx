@@ -229,7 +229,7 @@ static void test_expr(){
     else{
       int resu;
       sscanf(result,"%d",&resu);
-      if (resu==4294967264)
+      if (resu>65530)
       
         break;
       
