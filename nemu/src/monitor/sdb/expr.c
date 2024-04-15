@@ -202,6 +202,7 @@ bool check_parentheses(int p,int q){
       if(n<m){
         return false;
       }
+      Log("n:%d,m:%d,i:%d",n,m,i);
     }
     return true;
   }else
