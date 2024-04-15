@@ -213,35 +213,41 @@ bool check_parentheses(int p,int q){
   return false;
 }
 
-int find(int p,int q){
-  int n=0;
-  int m=0;
-  for(int i=p;i<q;i++){
-    if(tokens[i].type==TK_NUM){
-      continue;
-    }else if(tokens[i].type!=TK_LPAREN&&tokens[i].type!=TK_RPAREN){
-      if(m==0){
-        m=tokens[i].type;
-        n=i;
-      }else{
-        if(tokens[i].type<=m){
-          m=tokens[i].type;
-          n=i;
+// 定义运算符的优先级，越小优先级越高
+static int op_precedence(int type) {
+    switch (type) {
+        case TK_PLUS:
+        case TK_MINUS:
+            return 1;
+        case TK_MUL:
+        case TK_DIV:
+            return 2;
+        default:
+            return 999;  // 非运算符，优先级无穷大
+    }
+}
+
+int find(int p, int q) {
+    int i;
+    int min_prec = 999;  // 最小优先级初始化为最大整数
+    int op = -1;  // 存储主运算符位置
+    int depth = 0;  // 当前括号深度
+
+    for (i = p; i <= q; i++) {
+        if (tokens[i].type == TK_LPAREN) {
+            depth++;
+        } else if (tokens[i].type == TK_RPAREN) {
+            depth--;
+        } else if (depth == 0 && tokens[i].type != TK_NUM) {  // 只在最外层处理运算符
+            int prec = op_precedence(tokens[i].type);
+            // 当发现优先级相同的操作符时，选择最右侧的一个，保证左结合性
+            if (prec <= min_prec) {
+                min_prec = prec;
+                op = i;
+            }
         }
-      }
     }
-    else if (tokens[i].type==TK_LPAREN)
-    {
-      while (true)
-      {
-        i++;
-        if(tokens[i].type==TK_RPAREN)
-        break;
-      }
-    }
-  }
-  
-  Log("op:%d,type:%d",n,tokens[n].type);
-  
-  return n;
+
+
+    return op;
 }
