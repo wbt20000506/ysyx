@@ -210,7 +210,7 @@ void sdb_mainloop() {
 
 static void test_expr(){
   FILE *file;
-  char filename[]="../../../tools/gen-expr/input";
+  char filename[]="/home/parallels/ysyx-workbench/nemu/tools/gen-expr/input";
   char line[65536];
   file=fopen(filename,"r");
   if (file == NULL)
@@ -228,7 +228,7 @@ static void test_expr(){
       char *da;
       sprintf(da,"%d",data);
       if(data==line[0])
-        printf("pass\n");
+        Log("pass");
     }
   }
   fclose(file);
