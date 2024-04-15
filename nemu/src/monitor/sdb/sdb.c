@@ -223,7 +223,7 @@ static void test_expr(){
     break;
     else{
       int data;
-      char *avgr=line+2;
+      char *avgr=line+1;
       data=cmd_p(avgr);
       char *da;
       sprintf(da,"%d",data);
