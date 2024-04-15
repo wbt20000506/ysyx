@@ -232,6 +232,8 @@ int find(int p,int q){
       }
     }
   }
+  
   Log("op:%d,type:%d",n,tokens[n].type);
+  assert(0);
   return n;
 }
