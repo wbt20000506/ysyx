@@ -224,7 +224,7 @@ static void test_expr(){
     char *result = strtok(line," ");
     char *expr = strtok(NULL," ");
     Log("%s=%s",result,expr);
-    //assert(0);
+    assert(0);
     if(line[0]=='o')
     break;
     else{
