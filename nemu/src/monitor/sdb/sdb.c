@@ -209,6 +209,7 @@ void sdb_mainloop() {
 }
 
 static void test_expr(){
+  Log("123");
   FILE *file;
   char filename[]="/home/parallels/ysyx-workbench/nemu/tools/gen-expr/input";
   char line[65536];
