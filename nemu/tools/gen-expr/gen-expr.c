@@ -36,29 +36,27 @@ int choose(int n)
 	return rand() % n;
 }
 
-void gen_num(){
+static void gen_num(){
     buf[index_buf++]='0'+rand()%10;
 }
-void gen_rand_op(){
-    int i=rand()%4;
-    switch (i)
-    {
-    case 0:buf[index_buf++]='+';break;
-    case 1:buf[index_buf++]='-';break;
-    case 2:buf[index_buf++]='*';break;
-    case 3:buf[index_buf++]='/';break;
-    }
+static void gen_rand_op()
+{
+	char op[4] = {'+', '-', '*', '/'};
+	int pos = rand() % 4;
+	buf[index_buf++] = op[pos];
 }
-void gen(char a){
+static void gen(char a){
     buf[index_buf++]=a;
 }
 
 
 void  gen_rand_expr() {
+  if(index_buf > 65530)
+		printf("oversize\n");
   switch (choose(3)) {
-    case 0: gen_num(); break;
-    case 1: gen('('); gen_rand_expr(); gen(')'); break;
-    default: gen_rand_expr(); gen_rand_op(); gen_rand_expr(); break;
+    case 0: {gen_num(); break;}
+    case 1: {gen('('); gen_rand_expr(); gen(')'); break;}
+    default: {gen_rand_expr(); gen_rand_op(); gen_rand_expr(); break;}
   }
 }
 
@@ -71,6 +69,7 @@ int main(int argc, char *argv[]) {
   }
   int i;
   for (i = 0; i < loop; i ++) {
+    
     gen_rand_expr();
     sprintf(code_buf, code_format, buf);
 
@@ -78,9 +77,10 @@ int main(int argc, char *argv[]) {
     assert(fp != NULL);
     fputs(code_buf, fp);
     fclose(fp);
-
     int ret = system("gcc -Wall -Werror /tmp/.code.c -o /tmp/.expr");
-    if (ret != 0) continue;
+    if (ret != 0) {index_buf=0;
+    memset(buf, '\0', sizeof(buf));
+    continue;}
 
     fp = popen("/tmp/.expr", "r");
     assert(fp != NULL);
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
 
     printf("%u %s\n", result, buf);
     index_buf=0;
-    buf[0]='\0';
+    memset(buf, '\0', sizeof(buf));
   }
   return 0;
 }

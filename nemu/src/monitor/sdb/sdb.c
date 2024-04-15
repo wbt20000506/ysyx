@@ -119,7 +119,7 @@ static int cmd_p(char *args){
   bool success;
   word_t data=expr(args,&success);
   printf("%s=%u\n",args,data);
-  return success;
+  return data;
 }
 
 static int cmd_help(char *args);
@@ -208,12 +208,36 @@ void sdb_mainloop() {
   }
 }
 
-
+static void test_expr(){
+  FILE *file;
+  char filename[]="../../../tools/gen-expr/input";
+  char line[65536];
+  file=fopen(filename,"r");
+  if (file == NULL)
+  {
+    Log("Open filr error");
+  }
+  while (fgets(line,sizeof(line),file)!=NULL)
+  { 
+    if(line[0]=='o')
+    break;
+    else{
+      int data;
+      char *avgr=line+2;
+      data=cmd_p(avgr);
+      char *da;
+      sprintf(da,"%d",data);
+      if(data==line[0])
+        printf("pass\n");
+    }
+  }
+  fclose(file);
+}
 
 void init_sdb() {
   /* Compile the regular expressions. */
   init_regex();
-
+  test_expr();
   /* Initialize the watchpoint pool. */
   init_wp_pool();
 }
