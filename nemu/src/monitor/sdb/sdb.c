@@ -218,7 +218,7 @@ static void test_expr(){
     Log("Open filr error");
   }
   while (fgets(line,sizeof(line),file)!=NULL)
-  { int t=sizeof(line)/sizeof(char)-1;
+  { int t=strlen(line)-1;
     line[t]='\0';
     if(line[0]=='o')
     break;
