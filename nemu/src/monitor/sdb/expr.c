@@ -32,6 +32,10 @@ enum {
   TK_DIV,           // 除号 "/"
   TK_LPAREN,        // 左括号 "("
   TK_RPAREN,        // 右括号 ")"
+  TK_NEQ,
+  TK_AND,
+  TK_OR,
+  TK_REG
   /* TODO: Add more token types */
 };
 
@@ -51,8 +55,12 @@ static struct rule {
   {"\\/", '/'},          // division
   {"\\(", '('},          // left parenthesis
   {"\\)", ')'},          // right parenthesis
-  {"[0-9]+", TK_NUM},      // numbers
+  {"(0[xX][0-9A-Fa-f]+|\\b[0-9]+\\b)", TK_NUM},      // numbers
   {"==", TK_EQ},         // equal
+  {"!=",TK_NEQ},
+  {"&&",TK_AND},
+  {"\\|\\|",TK_OR},
+  {"\\${1,2}\\w+", TK_REG},
 };
 
 #define NR_REGEX ARRLEN(rules)
