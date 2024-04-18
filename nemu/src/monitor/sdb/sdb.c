@@ -23,7 +23,9 @@
 static int is_batch_mode = false;
 void init_regex();
 void init_wp_pool();
-
+void set_wp(char *arg, word_t value);
+void display_wp();
+void delete_wp(int n);
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char* rl_gets() {
   static char *line_read = NULL;
@@ -73,7 +75,7 @@ static int cmd_info(char *args){
   else if(*arg =='r')
     isa_reg_display();
   else if(*arg=='w'){
-    //display_wp();
+    display_wp();
   }
   else
     printf("Unknowm input\n");
@@ -115,6 +117,39 @@ static int cmd_x(char *args){
   return 0;
 }
 
+
+static int cmd_w(char *args)
+{
+  if(args == NULL)
+  {
+    printf("Unknown input, the standard format is 'w EXPR'\n");
+    return 0;
+  }
+  bool success;
+  word_t res = expr(args, &success);
+  if(!success)
+    printf("The expression is problematic\n");
+  else 
+    set_wp(args, res);
+  
+  return 0;
+}
+
+static int cmd_d(char *args)
+{
+  if(args == NULL)
+  {
+    printf("Unknown input, the standard format is 'd N'\n");
+    return 0;
+  }
+  char *arg = strtok(NULL, " ");
+  int n = strtol(arg, NULL, 10);
+  delete_wp(n);
+  return 0;
+}
+
+
+
 static int cmd_p(char *args){
   bool success;
   word_t data=expr(args,&success);
@@ -135,8 +170,8 @@ static struct {
   { "si", "Step", cmd_si },
   { "info","Print reg or watch",cmd_info },
   { "x","Print memory",cmd_x},
-  { "p","Compute",cmd_p},
-
+  { "w","Watchpoint",cmd_w},
+  { "d","Delete watchpoint",cmd_d},
   /* TODO: Add more commands */
 
 };
