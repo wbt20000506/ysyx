@@ -34,7 +34,6 @@ enum {
   TK_RPAREN,        // 右括号 ")"
   TK_NEQ,
   TK_AND,
-  TK_OR,
   TK_REG
   /* TODO: Add more token types */
 };
@@ -59,7 +58,6 @@ static struct rule {
   {"==", TK_EQ},         // equal
   {"!=",TK_NEQ},
   {"&&",TK_AND},
-  {"\\|\\|",TK_OR},
   {"\\${1,2}\\w+", TK_REG},
 };
 
@@ -128,7 +126,6 @@ static bool make_token(char *e) {
           case TK_AND:tokens[nr_token].type = TK_AND;break;
           case TK_EQ:tokens[nr_token].type = TK_EQ;break;
           case TK_NEQ:tokens[nr_token].type = TK_NEQ;break;
-          case TK_OR:tokens[nr_token].type = TK_OR;break;
           case TK_NUM:{tokens[nr_token].type = TK_NUM;
                       strncpy(tokens[nr_token].str,substr_start,substr_len);
                       tokens[nr_token].str[substr_len]='\0';break;}
@@ -202,6 +199,9 @@ word_t eval(int p,int q,bool *success){
     case TK_MINUS:return val1-val2;
     case TK_MUL:return val1*val2;
     case TK_DIV:return val1/val2;
+    case TK_EQ:return val1==val2;
+    case TK_NEQ:return val1!=val2;
+    case TK_AND:return val1&&val2;
     default:assert(0);
     }
   }
@@ -238,9 +238,14 @@ static int op_precedence(int type) {
     switch (type) {
         case TK_PLUS:
         case TK_MINUS:
-            return 1;
+            return 3;
         case TK_MUL:
         case TK_DIV:
+            return 4;
+        case TK_EQ:
+        case TK_NEQ:
+            return 1;
+        case TK_AND:
             return 2;
         default:
             return 999;  // 非运算符，优先级无穷大
