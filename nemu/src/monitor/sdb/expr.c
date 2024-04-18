@@ -176,11 +176,13 @@ word_t eval(int p,int q,bool *success){
     }else if(tokens[p].type==TK_NUM){
       word_t i;
       if(strncmp("0x", tokens[p].str, 2) == 0 || strncmp("0X", tokens[p].str, 2) == 0){
-        return strtol(tokens[p].str, NULL, 16);
+        sscanf(tokens[p].str,"%x",&i);
       }else{
         sscanf(tokens[p].str,"%d",&i);
       }
       return i;
+    }else if(tokens[p].type==TK_REG){
+      return isa_reg_str2val(tokens[p].str, success);
     }
   }
   else if(check_parentheses(p,q)==true)
@@ -203,7 +205,6 @@ word_t eval(int p,int q,bool *success){
     default:assert(0);
     }
   }
-  *success =false;
   return 0;
 }
 
