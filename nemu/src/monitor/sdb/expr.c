@@ -14,7 +14,7 @@
 ***************************************************************************************/
 
 #include <isa.h>
-
+#include <memory/vaddr.h>
 /* We use the POSIX regex functions to process regular expressions.
  * Type 'man regex' for more information about POSIX regex functions.
  */
@@ -34,6 +34,7 @@ enum {
   TK_RPAREN,        // 右括号 ")"
   TK_NEQ,
   TK_AND,
+  TK_DEREF,
   TK_REG
   /* TODO: Add more token types */
 };
@@ -153,7 +154,14 @@ word_t expr(char *e, bool *success) {
     *success = false;
     return 0;
   }
-
+  for (int i = 0; i < nr_token; i++) {
+    if (tokens[i].type == TK_MUL) {
+        if (i == 0 || tokens[i - 1].type == TK_LPAREN || tokens[i - 1].type == TK_PLUS || tokens[i - 1].type == TK_MINUS|| tokens[i - 1].type == TK_MUL
+        || tokens[i - 1].type == TK_DIV|| tokens[i - 1].type == TK_EQ|| tokens[i - 1].type == TK_NEQ|| tokens[i - 1].type == TK_AND) {
+            tokens[i].type = TK_DEREF;  
+        }
+    }
+}
   return eval(0,nr_token-1,success);
 }
 
@@ -202,6 +210,7 @@ word_t eval(int p,int q,bool *success){
     case TK_EQ:return val1==val2;
     case TK_NEQ:return val1!=val2;
     case TK_AND:return val1&&val2;
+    case TK_DEREF: return vaddr_read(val2,4);
     default:assert(0);
     }
   }
@@ -247,6 +256,8 @@ static int op_precedence(int type) {
             return 4;
         case TK_AND:
             return 3;
+        case TK_DEREF:
+            return 5;
         default:
             return 999;  // 非运算符，优先级无穷大
     }
