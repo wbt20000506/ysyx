@@ -176,7 +176,7 @@ word_t eval(int p,int q,bool *success){
     }else if(tokens[p].type==TK_NUM){
       word_t i;
       if(strncmp("0x", tokens[p].str, 2) == 0 || strncmp("0X", tokens[p].str, 2) == 0){
-        sscanf(tokens[p].str,"%x",&i);
+        return strtol(tokens[p].str, NULL, 16);
       }else{
         sscanf(tokens[p].str,"%d",&i);
       }
