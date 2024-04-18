@@ -238,15 +238,15 @@ static int op_precedence(int type) {
     switch (type) {
         case TK_PLUS:
         case TK_MINUS:
-            return 3;
+            return 1;
         case TK_MUL:
         case TK_DIV:
-            return 4;
+            return 2;
         case TK_EQ:
         case TK_NEQ:
-            return 1;
+            return 4;
         case TK_AND:
-            return 2;
+            return 3;
         default:
             return 999;  // 非运算符，优先级无穷大
     }
