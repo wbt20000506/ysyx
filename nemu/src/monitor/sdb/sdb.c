@@ -170,6 +170,7 @@ static struct {
   { "si", "Step", cmd_si },
   { "info","Print reg or watch",cmd_info },
   { "x","Print memory",cmd_x},
+  { "p","Computer",cmd_p},
   { "w","Watchpoint",cmd_w},
   { "d","Delete watchpoint",cmd_d},
   /* TODO: Add more commands */
