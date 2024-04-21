@@ -72,8 +72,8 @@ void free_wp(WP *wp)
     WP *temp=head;
     while (temp->next==free_)
     {
+      Log("n++");
       temp->next=NULL;
-      break;
     }
   }
   else if(wp->next != NULL && wp == head)
@@ -85,18 +85,17 @@ void free_wp(WP *wp)
   
   }
   else{
-    WP *tmp = head;
-    Log("2");
-    while(tmp->next)
-    {
-      if(tmp->next == wp)
-        break;
-      tmp = tmp->next;
-    }
-    tmp->next = wp->next;
-    wp->next = free_;
-    free_ = wp;
+  WP *tmp = head;
+  Log("2");
+  while(tmp->next)
+  {
+    if(tmp->next == wp)
+      break;
+    tmp = tmp->next;
   }
+  tmp->next = wp->next;
+  wp->next = free_;
+  free_ = wp;}
 }
 
 void set_wp(char *arg, word_t value)   //set the watchpoint
