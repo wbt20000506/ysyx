@@ -24,7 +24,7 @@ typedef struct watchpoint {
   /* TODO: Add more members if necessary */
 
   word_t old_value;
-  char expr[100];         // ** char *expr is error ** //
+  char expr[32];         // ** char *expr is error ** //
 } WP;
 
 
@@ -53,7 +53,7 @@ WP* new_wp()
   free_ = free_->next;
   tmp->next = head;
   head = tmp;
-  return tmp;
+  return head;
 }
 
 void free_wp(WP *wp)
