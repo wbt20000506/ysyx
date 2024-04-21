@@ -24,7 +24,7 @@ typedef struct watchpoint {
   /* TODO: Add more members if necessary */
 
   word_t old_value;
-  char expr[32];         // ** char *expr is error ** //
+  char expr[100];         // ** char *expr is error ** //
 } WP;
 
 
@@ -53,7 +53,7 @@ WP* new_wp()
   free_ = free_->next;
   tmp->next = head;
   head = tmp;
-  return head;
+  return tmp;
 }
 
 void free_wp(WP *wp)
@@ -63,22 +63,20 @@ void free_wp(WP *wp)
     printf("No watchpoints are using\n");
     assert(0);
   }
-  else if(wp->next == NULL)
+  if(wp->next == NULL)
   {
-    Log("1");
     wp->next = free_;
     free_ = wp;
-    head = NULL;
-    
+    head->next = NULL;
+    return;
   }
   else if(wp->next != NULL && wp == head)
   {
-    Log("2");
     head = wp->next;
     wp->next = free_;
     free_ = wp;
-  }else{
-    Log("3");
+    return;
+  }
   WP *tmp = head;
   while(tmp->next)
   {
@@ -89,7 +87,6 @@ void free_wp(WP *wp)
   tmp->next = wp->next;
   wp->next = free_;
   free_ = wp;
-  }
 }
 
 void set_wp(char *arg, word_t value)   //set the watchpoint
