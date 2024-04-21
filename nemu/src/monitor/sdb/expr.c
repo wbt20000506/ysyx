@@ -123,7 +123,7 @@ static bool make_token(char *e) {
           case '/':tokens[nr_token].type = TK_DIV;break;
           case '(':tokens[nr_token].type = TK_LPAREN;break;
           case ')':tokens[nr_token].type = TK_RPAREN;break;
-          case TK_REG:{tokens[nr_token].type = TK_REG;strncpy(tokens[nr_token].str,substr_start,2);
+          case TK_REG:{tokens[nr_token].type = TK_REG;strncpy(tokens[nr_token].str,substr_start+1,2);
                       tokens[nr_token].str[substr_len]='\0';break;}
           case TK_AND:tokens[nr_token].type = TK_AND;break;
           case TK_EQ:tokens[nr_token].type = TK_EQ;break;
