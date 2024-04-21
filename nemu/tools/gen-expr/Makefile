@@ -16,8 +16,8 @@
 NAME = gen-expr
 SRCS = gen-expr.c
 all:$(SRCS)
-	gcc -Wall -Werror $(SRCS) -o $(NAME)
+	gcc -Wall -Werror -g $(SRCS) -o $(NAME)
 run:$(NAME)
-	./$(NAME) 100 > input
+	./$(NAME) 10000 > input
 clean:
 	rm input $(NAME)

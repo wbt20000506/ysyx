@@ -23,7 +23,9 @@
 static int is_batch_mode = false;
 void init_regex();
 void init_wp_pool();
-
+void set_wp(char *arg, word_t value);
+void display_wp();
+void delete_wp(int n);
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char* rl_gets() {
   static char *line_read = NULL;
@@ -73,7 +75,7 @@ static int cmd_info(char *args){
   else if(*arg =='r')
     isa_reg_display();
   else if(*arg=='w'){
-    //display_wp();
+    display_wp();
   }
   else
     printf("Unknowm input\n");
@@ -115,11 +117,44 @@ static int cmd_x(char *args){
   return 0;
 }
 
+
+static int cmd_w(char *args)
+{
+  if(args == NULL)
+  {
+    printf("Unknown input, the standard format is 'w EXPR'\n");
+    return 0;
+  }
+  bool success;
+  word_t res = expr(args, &success);
+  if(!success)
+    printf("The expression is problematic\n");
+  else 
+    set_wp(args, res);
+  
+  return 0;
+}
+
+static int cmd_d(char *args)
+{
+  if(args == NULL)
+  {
+    printf("Unknown input, the standard format is 'd N'\n");
+    return 0;
+  }
+  char *arg = strtok(NULL, " ");
+  int n = strtol(arg, NULL, 10);
+  delete_wp(n);
+  return 0;
+}
+
+
+
 static int cmd_p(char *args){
   bool success;
   word_t data=expr(args,&success);
   printf("%s=%u\n",args,data);
-  return success;
+  return data;
 }
 
 static int cmd_help(char *args);
@@ -135,8 +170,9 @@ static struct {
   { "si", "Step", cmd_si },
   { "info","Print reg or watch",cmd_info },
   { "x","Print memory",cmd_x},
-  { "p","Compute",cmd_p},
-
+  { "p","Computer",cmd_p},
+  { "w","Watchpoint",cmd_w},
+  { "d","Delete watchpoint",cmd_d},
   /* TODO: Add more commands */
 
 };
@@ -208,10 +244,45 @@ void sdb_mainloop() {
   }
 }
 
+static void test_expr(){
+  FILE *file;
+  char filename[]="/home/parallels/ysyx-workbench/nemu/tools/gen-expr/input1";
+  char line[65536];
+  file=fopen(filename,"r");
+  if (file == NULL)
+  {
+    Log("Open filr error");
+  }
+  while (fgets(line,sizeof(line),file)!=NULL)
+  { 
+    int t=strlen(line)-1;
+    line[t]='\0';
+    char *result = strtok(line," ");
+    char *expr = strtok(NULL," ");
+    //Log("%s=%s",result,expr);
+    
+    if(line[0]=='o')
+    break;
+    else{
+      int resu;
+      sscanf(result,"%d",&resu);
+      if (resu<0)
+      
+        continue;
+      
+      int data=cmd_p(expr);
+      if(data==resu)
+      Log("pass");
+    }
+  }
+  fclose(file);
+}
+
 void init_sdb() {
   /* Compile the regular expressions. */
   init_regex();
-
+  test_expr();
   /* Initialize the watchpoint pool. */
   init_wp_pool();
 }
+

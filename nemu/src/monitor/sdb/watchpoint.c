@@ -23,7 +23,10 @@ typedef struct watchpoint {
 
   /* TODO: Add more members if necessary */
 
+  word_t old_value;
+  char expr[32];         // ** char *expr is error ** //
 } WP;
+
 
 static WP wp_pool[NR_WP] = {};
 static WP *head = NULL, *free_ = NULL;
@@ -39,5 +42,116 @@ void init_wp_pool() {
   free_ = wp_pool;
 }
 
-/* TODO: Implement the functionality of watchpoint */
+WP* new_wp()
+{
+  if(free_ == NULL)
+  {
+    printf("Unused watchpoint\n");
+    assert(0);
+  } 
+  WP* tmp = free_;
+  free_ = free_->next;
+  tmp->next = head;
+  head = tmp;
+  return head;
+}
 
+void free_wp(WP *wp)
+{
+  if(wp == NULL)
+  {
+    printf("No watchpoints are using\n");
+    assert(0);
+  }
+  else if(wp->next == NULL)
+  {
+    Log("1");
+    wp->next = free_;
+    free_ = wp;
+    head = NULL;
+    
+  }
+  else if(wp->next != NULL && wp == head)
+  {
+    Log("2");
+    head = wp->next;
+    wp->next = free_;
+    free_ = wp;
+  }else{
+    Log("3");
+  WP *tmp = head;
+  while(tmp->next)
+  {
+    if(tmp->next == wp)
+      break;
+    tmp = tmp->next;
+  }
+  tmp->next = wp->next;
+  wp->next = free_;
+  free_ = wp;
+  }
+}
+
+void set_wp(char *arg, word_t value)   //set the watchpoint
+{
+  WP *new = new_wp();
+  new->old_value = value;
+  strcpy(new->expr, arg);
+  printf("Hardware watchpoint %d: %s\n", new->NO, new->expr);
+}
+
+void scan_wp()    //scan all watchpoints
+{
+  WP *tmp = head;
+  //printf("hello\n");
+  while(tmp)
+  {
+    bool success;
+    word_t new_value = expr(tmp->expr, &success);
+    //printf("hello\n");
+    if(new_value != tmp->old_value)
+    {
+      printf("The watchpoint %d: %s has changed\n", tmp->NO, tmp->expr);
+      printf("Old value = %u\n", tmp->old_value);
+      printf("New value = %u\n", new_value);
+      tmp->old_value = new_value;
+      nemu_state.state = NEMU_STOP;
+      return;
+    }
+    tmp = tmp->next;
+  }
+  //return 0;
+}
+void display_wp()   //display all watchpoints
+{
+  WP *tmp = head;
+  if(tmp == NULL)
+    printf("No watchpoints.\n");
+  else
+  {
+    printf("%-20s%-20s%-20s\n", "Num", "What", "Value");
+    while(tmp)
+    {
+      printf("%-20d%-20s%-20u\n", tmp->NO, tmp->expr, tmp->old_value);
+      tmp = tmp->next;
+    }
+  }
+}
+void delete_wp(int n)  //delete the watchpoint, its NO is n.
+{
+  WP *tmp = head;
+  if(tmp == NULL)
+    printf("The watchpoint for which NO is %d does't exist.\n", n);
+  else
+  {
+    while(tmp->NO != n)
+      tmp = tmp->next;
+    if(tmp == NULL)
+      printf("The watchpoint for which NO is %d does't exist.\n", n);
+    else
+    {
+      free_wp(tmp);
+      printf("Deleted success\n");
+    }
+  }
+}
