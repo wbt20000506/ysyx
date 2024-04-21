@@ -36,28 +36,46 @@ int choose(int n)
 	return rand() % n;
 }
 
-static void gen_num(){
-    buf[index_buf++]='0'+rand()%10;
-}
-static void gen_rand_op()
-{
-	char op[4] = {'+', '-', '*', '/'};
-	int pos = rand() % 4;
-	buf[index_buf++] = op[pos];
-}
-static void gen(char a){
-    buf[index_buf++]=a;
+
+static void gen(char c) {
+    if (index_buf < sizeof(buf) - 1) { // 确保有空间添加字符和结尾的'\0'
+        buf[index_buf++] = c;
+    }
 }
 
+static void gen_num() {
+    if (index_buf < sizeof(buf) - 2) { // 确保至少有两个字符的空间
+        int num = rand() % 10;
+        buf[index_buf++] = '0' + num;
+    }
+}
 
-void  gen_rand_expr() {
-  if(index_buf > 65530)
-		printf("oversize\n");
-  switch (choose(3)) {
-    case 0: {gen_num(); break;}
-    case 1: {gen('('); gen_rand_expr(); gen(')'); break;}
-    default: {gen_rand_expr(); gen_rand_op(); gen_rand_expr(); break;}
-  }
+static void gen_rand_op() {
+    if (index_buf < sizeof(buf) - 2) { // 确保至少有两个字符的空间
+        char op[4] = {'+', '-', '*', '/'};
+        int pos = rand() % 4;
+        buf[index_buf++] = op[pos];
+    }
+}
+
+static void gen_rand_expr() {
+    if (index_buf >= sizeof(buf) - 3) return; // 确保有足够空间至少添加一个操作符和括号
+
+    switch (choose(3)) {
+        case 0: gen_num(); break;
+        case 1: 
+            gen('('); 
+            if (index_buf < sizeof(buf) - 3) { // 检查添加左括号后是否还有空间继续
+                gen_rand_expr(); 
+                gen(')'); 
+            }
+            break;
+        default: 
+            gen_rand_expr(); 
+            gen_rand_op(); 
+            gen_rand_expr(); 
+            break;
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -69,18 +87,17 @@ int main(int argc, char *argv[]) {
   }
   int i;
   for (i = 0; i < loop; i ++) {
-    
     gen_rand_expr();
+    
     sprintf(code_buf, code_format, buf);
 
     FILE *fp = fopen("/tmp/.code.c", "w");
     assert(fp != NULL);
     fputs(code_buf, fp);
     fclose(fp);
+
     int ret = system("gcc -Wall -Werror /tmp/.code.c -o /tmp/.expr");
-    if (ret != 0) {index_buf=0;
-    memset(buf, '\0', sizeof(buf));
-    continue;}
+    if (ret != 0) continue;
 
     fp = popen("/tmp/.expr", "r");
     assert(fp != NULL);
@@ -91,7 +108,7 @@ int main(int argc, char *argv[]) {
 
     printf("%u %s\n", result, buf);
     index_buf=0;
-    memset(buf, '\0', sizeof(buf));
+    buf[index_buf] = '\0';
   }
   return 0;
 }
