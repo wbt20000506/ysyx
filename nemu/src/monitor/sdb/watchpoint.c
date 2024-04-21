@@ -49,6 +49,7 @@ WP* new_wp()
     printf("Unused watchpoint\n");
     assert(0);
   } 
+  Log("pp");
   WP* tmp = free_;
   free_ = free_->next;
   tmp->next = head;
@@ -68,7 +69,7 @@ void free_wp(WP *wp)
     Log("0");
     wp->next = free_;
     free_ = wp;
-    head= NULL;
+    head->next= NULL;
     return;
   }
   else if(wp->next != NULL && wp == head)
