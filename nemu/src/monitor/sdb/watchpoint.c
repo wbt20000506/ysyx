@@ -68,11 +68,12 @@ void free_wp(WP *wp)
   else if(wp==end){
     WP *tmp=head;
     while(tmp){
-      tmp=tmp->next;
+      
       if(tmp->next==end){
         tmp->next=NULL;
         break;
-      }
+      }else
+      tmp=tmp->next;
     }
     end->next=free_;
     free_=end;
@@ -82,14 +83,17 @@ void free_wp(WP *wp)
   {
     WP *tmp=head;
     while(tmp){
-      tmp=tmp->next;
+      
       if(tmp->next==wp){
         tmp->next=wp->next;
         break;
-      }
+      }else
+      tmp=tmp->next;
+    }
+      
       wp->next=free_;
       free_=wp;
-    }
+    
   }
 }
 
