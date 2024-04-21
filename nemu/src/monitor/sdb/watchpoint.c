@@ -24,13 +24,13 @@ typedef struct watchpoint {
   /* TODO: Add more members if necessary */
 
   word_t old_value;
-  char expr[100];         // ** char *expr is error ** //
+  char expr[32];         // ** char *expr is error ** //
 } WP;
 
 
 static WP wp_pool[NR_WP] = {};
 static WP *head = NULL, *free_ = NULL;
-
+static WP *end = NULL, *free_end = NULL;
 void init_wp_pool() {
   int i;
   for (i = 0; i < NR_WP; i ++) {
@@ -38,64 +38,59 @@ void init_wp_pool() {
     wp_pool[i].next = (i == NR_WP - 1 ? NULL : &wp_pool[i + 1]);
   }
 
-  head = NULL;
+  head = end = NULL;
   free_ = wp_pool;
+  free_end = &wp_pool[NR_WP - 1];
 }
 
 WP* new_wp()
 {
-  if(free_ == NULL)
-  {
-    printf("Unused watchpoint\n");
-    assert(0);
-  } 
-  Log("pp");
-  WP* tmp = free_;
-  free_ = free_->next;
-  tmp->next = head;
-  head = tmp;
-  return tmp;
+  if(head==NULL){
+    head=end=free_;
+    free_=free_->next;
+    head->next=NULL;
+  }else{
+    end->next=free_;
+    free_=free_->next;
+    end=end->next;
+    end->next=NULL;
+  }
+  return head;
 }
 
 void free_wp(WP *wp)
 {
-  if(wp == NULL)
-  {
-    printf("No watchpoints are using\n");
-    assert(0);
+  if (wp==head){
+    head=head->next;
+    wp->next=free_;
+    free_=wp;
   }
-  else if(wp->next == NULL)
+  else if(wp==end){
+    WP *tmp=head;
+    while(tmp){
+      tmp=tmp->next;
+      if(tmp->next==end){
+        tmp->next=NULL;
+        break;
+      }
+    }
+    end->next=free_;
+    free_=end;
+    end=tmp;
+  }
+  else
   {
-    Log("0");
-    wp->next = free_;
-    free_ = wp;
-    WP *temp=head;
-    while (temp->next==free_)
-    {
-      Log("n++");
-      temp->next=NULL;
+    WP *tmp=head;
+    while(tmp){
+      tmp=tmp->next;
+      if(tmp->next==wp){
+        tmp->next=wp->next;
+        break;
+      }
+      wp->next=free_;
+      free_=wp;
     }
   }
-  else if(wp->next != NULL && wp == head)
-  {
-    Log("1");
-    head = wp->next;
-    wp->next = free_;
-    free_ = wp;
-  
-  }
-  else{
-  WP *tmp = head;
-  Log("2");
-  while(tmp->next)
-  {
-    if(tmp->next == wp)
-      break;
-    tmp = tmp->next;
-  }
-  tmp->next = wp->next;
-  wp->next = free_;
-  free_ = wp;}
 }
 
 void set_wp(char *arg, word_t value)   //set the watchpoint
