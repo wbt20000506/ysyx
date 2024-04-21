@@ -64,13 +64,16 @@ void free_wp(WP *wp)
     printf("No watchpoints are using\n");
     assert(0);
   }
-  if(wp->next == NULL)
+  else if(wp->next == NULL)
   {
     Log("0");
     wp->next = free_;
     free_ = wp;
-    head->next= NULL;
-    return;
+    WP *temp=head;
+    while (temp->next==free_)
+    {
+      temp->next=NULL;
+    }
   }
   else if(wp->next != NULL && wp == head)
   {
@@ -78,19 +81,21 @@ void free_wp(WP *wp)
     head = wp->next;
     wp->next = free_;
     free_ = wp;
-    return;
+  
   }
-  WP *tmp = head;
-  Log("2");
-  while(tmp->next)
-  {
-    if(tmp->next == wp)
-      break;
-    tmp = tmp->next;
+  else{
+    WP *tmp = head;
+    Log("2");
+    while(tmp->next)
+    {
+      if(tmp->next == wp)
+        break;
+      tmp = tmp->next;
+    }
+    tmp->next = wp->next;
+    wp->next = free_;
+    free_ = wp;
   }
-  tmp->next = wp->next;
-  wp->next = free_;
-  free_ = wp;
 }
 
 void set_wp(char *arg, word_t value)   //set the watchpoint
