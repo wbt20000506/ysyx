@@ -55,7 +55,7 @@ WP* new_wp()
     end=end->next;
     end->next=NULL;
   }
-  return head;
+  return end;
 }
 
 void free_wp(WP *wp)
