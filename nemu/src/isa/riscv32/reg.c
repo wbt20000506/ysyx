@@ -41,7 +41,7 @@ word_t isa_reg_str2val(const char *s, bool *success) {
   for (int i=0;i<32;i++){
     Log("%s",reg_name(i));
     if(strcmp(s,reg_name(i))==0)
-    return cpu.gpr[i];
+      return cpu.gpr[i];
     else{
       *success=false;
       Log("error");
