@@ -65,19 +65,22 @@ void free_wp(WP *wp)
   }
   if(wp->next == NULL)
   {
+    Log("0");
     wp->next = free_;
     free_ = wp;
-    head->next = NULL;
+    head= NULL;
     return;
   }
   else if(wp->next != NULL && wp == head)
   {
+    Log("1");
     head = wp->next;
     wp->next = free_;
     free_ = wp;
     return;
   }
   WP *tmp = head;
+  Log("2");
   while(tmp->next)
   {
     if(tmp->next == wp)
