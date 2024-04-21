@@ -63,7 +63,7 @@ void free_wp(WP *wp)
     printf("No watchpoints are using\n");
     assert(0);
   }
-  if(wp->next == NULL)
+  else if(wp->next == NULL)
   {
     wp->next = free_;
     free_ = wp;
@@ -76,7 +76,7 @@ void free_wp(WP *wp)
     wp->next = free_;
     free_ = wp;
     return;
-  }
+  }else{
   WP *tmp = head;
   while(tmp->next)
   {
@@ -87,6 +87,7 @@ void free_wp(WP *wp)
   tmp->next = wp->next;
   wp->next = free_;
   free_ = wp;
+  }
 }
 
 void set_wp(char *arg, word_t value)   //set the watchpoint
