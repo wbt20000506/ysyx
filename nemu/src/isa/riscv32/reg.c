@@ -42,11 +42,9 @@ word_t isa_reg_str2val(const char *s, bool *success) {
     Log("%s",reg_name(i));
     if(strcmp(s,reg_name(i))==0)
       return cpu.gpr[i];
-    else{
-      *success=false;
-      Log("error");
-    }
 }
+  *success=false;
+  Log("error");
   return 0;
 }
   
