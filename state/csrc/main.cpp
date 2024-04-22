@@ -1,25 +1,29 @@
-#include <verilated.h>
-#include "Vtop.h" // 自动生成的Verilator模块头文件
-#include "nvboard.h"
+#include <nvboard.h>
+#include <Vtop.h>
 
-extern void nvboard_bind_all_pins(Vtop* top); // 如果在其他文件中定义了这个函数
+static TOP_NAME dut;
 
-int main(int argc, char** argv) {
-    Verilated::commandArgs(argc, argv);
-    Vtop* top = new Vtop; // 实例化您的Verilog模块
-    nvboard_bind_all_pins(top); // 绑定引脚
-    nvboard_init(); // 初始化NVBoard
+void nvboard_bind_all_pins(TOP_NAME* top);
 
-    while (!Verilated::gotFinish()) {
-        // 这里处理输入和运行Verilog模块
-        top->eval(); // 评估模块
-        nvboard_update(); // 更新NVBoard状态
-    }
-
-    top->final(); // 清理模块
-    delete top;
-    nvboard_quit(); // 退出NVBoard
-
-    return 0;
+static void single_cycle() {
+  dut.clk = 0; dut.eval();
+  dut.clk = 1; dut.eval();
 }
 
+static void reset(int n) {
+  dut.reset = 0;
+  while (n -- > 0) single_cycle();
+  dut.reset = 1;
+}
+
+int main() {
+  nvboard_bind_all_pins(&dut);
+  nvboard_init();
+
+  reset(10);
+
+  while(1) {
+    nvboard_update();
+    single_cycle();
+  }
+}
