@@ -154,7 +154,7 @@ static int cmd_p(char *args){
   bool success;
   word_t data=expr(args,&success);
   printf("%s=%u\n",args,data);
-  return data;
+  return 0;
 }
 
 static int cmd_help(char *args);
@@ -245,6 +245,7 @@ void sdb_mainloop() {
 }
 
 static void test_expr(){
+  bool success;
   FILE *file;
   char filename[]="/home/parallels/ysyx-workbench/nemu/tools/gen-expr/input1";
   char line[65536];
@@ -258,7 +259,7 @@ static void test_expr(){
     int t=strlen(line)-1;
     line[t]='\0';
     char *result = strtok(line," ");
-    char *expr = strtok(NULL," ");
+    char *expr1 = strtok(NULL," ");
     //Log("%s=%s",result,expr);
     
     if(line[0]=='o')
@@ -270,7 +271,7 @@ static void test_expr(){
       
         continue;
       
-      int data=cmd_p(expr);
+      int data=expr(expr1,&success);
       if(data==resu)
       Log("pass");
     }
