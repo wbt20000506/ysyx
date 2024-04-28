@@ -154,6 +154,7 @@ static int cmd_p(char *args){
   bool success;
   word_t data=expr(args,&success);
   printf("%s=%u\n",args,data);
+  printf("%s=0x%08x\n",args,data);
   return 0;
 }
 
