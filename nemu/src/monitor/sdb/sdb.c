@@ -244,7 +244,7 @@ void sdb_mainloop() {
     if (i == NR_CMD) { printf("Unknown command '%s'\n", cmd); }
   }
 }
-
+static void test_expr() __attribute__((used));
 static void test_expr(){
   bool success;
   FILE *file;
@@ -283,7 +283,7 @@ static void test_expr(){
 void init_sdb() {
   /* Compile the regular expressions. */
   init_regex();
-  test_expr();
+  //test_expr();
   /* Initialize the watchpoint pool. */
   init_wp_pool();
 }
