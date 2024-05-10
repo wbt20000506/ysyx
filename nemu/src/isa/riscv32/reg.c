@@ -37,14 +37,18 @@ void isa_reg_display() {
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
-  Log("%s",s);
-  for (int i=0;i<32;i++){
-    Log("%s",reg_name(i));
-    if(strcmp(s,reg_name(i))==0)
-      return cpu.gpr[i];
+    *success = false;  
+    for (int i = 0; i < 32; i++) {
+        if (strcmp(s, reg_name(i)) == 0) {
+            *success = true;  
+            return cpu.gpr[i];  
+        }
+    }
+    if (strcmp(s, "pc") == 0) {
+        *success = true;
+        return cpu.pc;  
+    }
+    return 0;
 }
-  *success=false;
-  Log("error");
-  return 0;
-}
+
   

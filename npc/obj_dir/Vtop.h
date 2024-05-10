@@ -11,6 +11,7 @@
 #include "systemc.h"
 #include "verilated_sc.h"
 #include "verilated.h"
+#include "svdpi.h"
 
 class Vtop__Syms;
 class Vtop___024root;
@@ -27,9 +28,21 @@ SC_MODULE(Vtop) {
     // PORTS
     // The application code writes and reads these signals to
     // propagate new values into/out from the Verilated model.
-    sc_in<bool> &a;
-    sc_in<bool> &b;
-    sc_out<bool> &f;
+    sc_in<bool> &clk;
+    sc_in<bool> &rst;
+    sc_out<bool> &wen_wire;
+    sc_out<uint32_t> &alucotrol_wire;
+    sc_out<uint32_t> &immtype_wire;
+    sc_out<bool> &of_wire;
+    sc_out<bool> &zf_wire;
+    sc_out<bool> &nf_wire;
+    sc_out<bool> &cf_wire;
+    sc_out<uint32_t> &pc_wire;
+    sc_out<uint32_t> &rddata_wire;
+    sc_out<uint32_t> &immext_wire;
+    sc_out<uint32_t> &rs1data_wire;
+    sc_in<uint32_t> &inst;
+    sc_out<uint32_t> &rs2data_wire;
 
     // CELLS
     // Public to allow access to /* verilator public */ items.

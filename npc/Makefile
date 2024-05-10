@@ -1,14 +1,14 @@
-VSRC = $(wildcard ./vsrc/top.v)
+VSRC = $(wildcard ./vsrc/*.v)
 CSRC = $(wildcard ./csrc/sc_main.cpp)
 
 all:$(CSRC) $(VSRC)
-	verilator --sc --trace --exe -Wall $(CSRC) $(VSRC)
+	verilator --sc --trace --exe -Wall --top-module top $(CSRC) $(VSRC)
 	make -j -C obj_dir -f Vtop.mk Vtop
 	obj_dir/Vtop
 
 sim:$(CSRC) $(VSRC)
 	$(call git_commit, "sim RTL")
-	verilator --sc --trace --exe -Wall $(CSRC) $(VSRC)
+	verilator --sc --trace --exe -Wall --top-module top $(CSRC) $(VSRC)
 	make -j -C obj_dir -f Vtop.mk Vtop
 	obj_dir/Vtop
 	gtkwave wave.vcd

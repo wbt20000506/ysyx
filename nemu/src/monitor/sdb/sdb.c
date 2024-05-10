@@ -154,7 +154,8 @@ static int cmd_p(char *args){
   bool success;
   word_t data=expr(args,&success);
   printf("%s=%u\n",args,data);
-  return data;
+  printf("%s=0x%08x\n",args,data);
+  return 0;
 }
 
 static int cmd_help(char *args);
@@ -243,8 +244,9 @@ void sdb_mainloop() {
     if (i == NR_CMD) { printf("Unknown command '%s'\n", cmd); }
   }
 }
-
+static void test_expr() __attribute__((used));
 static void test_expr(){
+  bool success;
   FILE *file;
   char filename[]="/home/parallels/ysyx-workbench/nemu/tools/gen-expr/input1";
   char line[65536];
@@ -258,7 +260,7 @@ static void test_expr(){
     int t=strlen(line)-1;
     line[t]='\0';
     char *result = strtok(line," ");
-    char *expr = strtok(NULL," ");
+    char *expr1 = strtok(NULL," ");
     //Log("%s=%s",result,expr);
     
     if(line[0]=='o')
@@ -270,7 +272,7 @@ static void test_expr(){
       
         continue;
       
-      int data=cmd_p(expr);
+      int data=expr(expr1,&success);
       if(data==resu)
       Log("pass");
     }
@@ -281,7 +283,7 @@ static void test_expr(){
 void init_sdb() {
   /* Compile the regular expressions. */
   init_regex();
-  test_expr();
+  //test_expr();
   /* Initialize the watchpoint pool. */
   init_wp_pool();
 }
