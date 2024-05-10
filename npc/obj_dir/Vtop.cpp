@@ -4,21 +4,35 @@
 #include "Vtop.h"
 #include "Vtop__Syms.h"
 #include "verilated_vcd_sc.h"
+#include "verilated_dpi.h"
 
 //============================================================
 // Constructors
 
 Vtop::Vtop(sc_module_name /* unused */)
     : vlSymsp{new Vtop__Syms(nullptr, name(), this)}
-    , a{vlSymsp->TOP.a}
-    , b{vlSymsp->TOP.b}
-    , f{vlSymsp->TOP.f}
+    , clk{vlSymsp->TOP.clk}
+    , rst{vlSymsp->TOP.rst}
+    , wen_wire{vlSymsp->TOP.wen_wire}
+    , alucotrol_wire{vlSymsp->TOP.alucotrol_wire}
+    , immtype_wire{vlSymsp->TOP.immtype_wire}
+    , of_wire{vlSymsp->TOP.of_wire}
+    , zf_wire{vlSymsp->TOP.zf_wire}
+    , nf_wire{vlSymsp->TOP.nf_wire}
+    , cf_wire{vlSymsp->TOP.cf_wire}
+    , pc_wire{vlSymsp->TOP.pc_wire}
+    , rddata_wire{vlSymsp->TOP.rddata_wire}
+    , immext_wire{vlSymsp->TOP.immext_wire}
+    , rs1data_wire{vlSymsp->TOP.rs1data_wire}
+    , inst{vlSymsp->TOP.inst}
+    , rs2data_wire{vlSymsp->TOP.rs2data_wire}
     , rootp{&(vlSymsp->TOP)}
 {
     // Sensitivities on all clocks and combinational inputs
     SC_METHOD(eval);
-    sensitive << a;
-    sensitive << b;
+    sensitive << clk;
+    sensitive << rst;
+    sensitive << inst;
 
 }
 
