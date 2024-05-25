@@ -217,4 +217,13 @@ config RT_CHECK
 config WATCHPOINT
   bool "Enable watchpoint support"
   default y
+
+config MTRACE
+  bool "Enable mtrace support"
+  default y
+
+config FTRACE
+  bool "Enable ftarce support"
+  default y
+
 endmenu

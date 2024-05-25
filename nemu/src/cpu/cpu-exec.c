@@ -17,7 +17,7 @@
 #include <cpu/decode.h>
 #include <cpu/difftest.h>
 #include <locale.h>
-
+extern char *elf_file;
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
  * This is useful when you use the `si' command.
@@ -29,9 +29,63 @@ CPU_state cpu = {};
 uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
+static char *p_inst=NULL; 
+//static int block_nun=1;
+char *load_elf_symbols(const char* elf_path,const uint32_t addr);
+typedef struct {
+    char rbuffer[10][256];  // 储存字符串的二维字符数组
+    int rhead;
+    int rtail;
+} RingBuffer;
+
+RingBuffer rb = { .rhead = 0, .rtail = 0 };
+
+static void writeRingbuffer(RingBuffer *rb, const char *prb) {
+    strncpy(rb->rbuffer[rb->rhead], prb, 255);  // 复制字符串到环形缓冲区
+    rb->rhead = (rb->rhead + 1) % 10;  // 环形递增头指针
+    if (rb->rhead == rb->rtail) {  // 如果头追上尾部，尾部也要向前移动
+        rb->rtail = (rb->rtail + 1) % 10;
+    }
+}
+
+static void printRingbuffer(const RingBuffer *rb) {
+    int current = rb->rtail;
+    do {
+        printf("%s\n", rb->rbuffer[current]);
+        current = (current + 1) % 10;
+    } while (current != rb->rhead-1);
+}
+static void ftace(char j,vaddr_t f_pc,uint32_t f_inst,vaddr_t f_dnpc) __attribute__((used));
+static void ftace(char j,vaddr_t f_pc,uint32_t f_inst,vaddr_t f_dnpc) {
+    if(j=='j'){
+      if (f_inst==0x00008067)
+      {
+        //block_nun--;
+        //int a=block_nun;
+        printf("0x%08x:",f_pc);
+        // while(a--){
+        //   printf(" ");
+        // }
+        load_elf_symbols(elf_file,f_dnpc);
+        printf("ret [%s]\n",load_elf_symbols(elf_file,f_dnpc));
+      }else
+      {
+        //int b=block_nun;
+        printf("0x%08x:",f_pc);
+        // while(b--){
+        //   printf(" ");
+        // }
+        
+        printf("call [%s@0x%08x]\n",load_elf_symbols(elf_file,f_dnpc),f_dnpc);
+        //block_nun++;
+      }
+    }
+}
+
 
 void device_update();
 void scan_wp();
+
 
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
@@ -64,15 +118,22 @@ static void exec_once(Decode *s, vaddr_t pc) {
   space_len = space_len * 3 + 1;
   memset(p, ' ', space_len);
   p += space_len;
-
 #ifndef CONFIG_ISA_loongarch32r
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
-      MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst.val, ilen);
+      MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst.val, ilen);  
 #else
   p[0] = '\0'; // the upstream llvm does not support loongarch32r
 #endif
 #endif
+  p_inst=p;
+#ifdef CONFIG_FTRACE
+  ftace(*p,s->pc,s->isa.inst.val,s->dnpc);
+#endif
+  char prb[100];
+  memset(prb,' ',100);
+  sprintf(prb,"    0x%08x: %08x      %s",s->pc,s->isa.inst.val,p_inst);
+  writeRingbuffer(&rb,prb);  
 }
 
 static void execute(uint64_t n) {
@@ -81,10 +142,18 @@ static void execute(uint64_t n) {
     exec_once(&s, cpu.pc);
     g_nr_guest_inst ++;
     trace_and_difftest(&s, cpu.pc);
-    if (nemu_state.state != NEMU_RUNNING) break;
+    if (nemu_state.state != NEMU_RUNNING){
+      if (s.isa.inst.val!=0x00100073)
+      {
+        printRingbuffer(&rb);     
+        printf("--> 0x%08x: %08x      %s\n",s.pc,s.isa.inst.val,p_inst);
+      }
+      break;}
     IFDEF(CONFIG_DEVICE, device_update());
   }
 }
+
+
 
 static void statistic() {
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));

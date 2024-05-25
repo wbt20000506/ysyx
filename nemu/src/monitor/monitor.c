@@ -23,6 +23,7 @@ void init_difftest(char *ref_so_file, long img_size, int port);
 void init_device();
 void init_sdb();
 void init_disasm(const char *triple);
+void load_elf_symbols(const char* elf_path);
 
 static void welcome() {
   Log("Trace: %s", MUXDEF(CONFIG_TRACE, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
@@ -44,9 +45,23 @@ void sdb_set_batch_mode();
 static char *log_file = NULL;
 static char *diff_so_file = NULL;
 static char *img_file = NULL;
+char *elf_file = NULL;
 static int difftest_port = 1234;
 
 static long load_img() {
+  if (img_file != NULL) {
+      elf_file = malloc(strlen(img_file) + 1);
+      strcpy(elf_file,img_file);
+      char *par=elf_file;
+      while (*(par)!='.')
+      {
+        par++;
+      }
+      *(par+1)='e';
+      *(par+2)='l';
+      *(par+3)='f';
+      Log("%s",elf_file);
+  }
   if (img_file == NULL) {
     Log("No image is given. Use the default build-in image.");
     return 4096; // built-in image size
@@ -141,6 +156,7 @@ void init_monitor(int argc, char *argv[]) {
 
   /* Display welcome message. */
   welcome();
+
 }
 #else // CONFIG_TARGET_AM
 static long load_img() {
