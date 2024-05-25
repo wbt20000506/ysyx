@@ -1,4 +1,4 @@
-module RegisterFile(
+module ysyx_23060286_RegisterFile(
   input clk,
   input [31:0] rddata,
   input [4:0] waddr,
