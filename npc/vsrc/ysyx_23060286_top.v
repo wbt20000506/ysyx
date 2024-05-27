@@ -1,28 +1,24 @@
 module ysyx_23060286_top (
   input clk,
   input rst,
-  output [31:0] pc_wire,
-  
-  output [31:0] rddata_wire,
-  output wen_wire,
-  output [5:0] alucotrol_wire,
-  output [2:0] immtype_wire,
-  output [31:0] immext_wire,
-  output branch_wire,
-  output zero_wire,
-  output jump_wire,
-  /* verilator lint_off UNUSED */
-  output [31:0] rs1data_wire,
-  input [31:0] inst,
-  output [31:0] rs2data_wire,
-  output [31:0] npc_wire
-  /* verilator lint_on UNUSED */
-
+  /* verilator lint_off UNDRIVEN */
+  input [31:0] inst_wire,
+  /* verilator lint_off UNDRIVEN */
+  input [31:0] readdata_wire,
+  output [31:0] npc_wire,pc_wire,snpc_wire,rs1data_wire,rs2data_wire,immext_wire,srcb_wire,aluresult_wire,dnpc_wire,result_wire,srca_wire,
+  output pcsrc,memwrite,alusrc,regwrite,zero,jalr,auipc,
+  output [1:0] resultsrc,immsrc,
+  output [2:0] alucontrol
 );
-	ysyx_23060286_Pc PC(clk,rst,npc_wire,pc_wire);
-  ysyx_23060286_Snpc SNPC(pc_wire,branch_wire,zero_wire,jump_wire,immext_wire,rs1data_wire,npc_wire);
-  ysyx_23060286_RegisterFile GPR(clk,rddata_wire,inst[11:7],inst[19:15],inst[24:20],wen_wire,rs1data_wire,rs2data_wire);
-  ysyx_23060286_Idu IDU(inst[6:0],inst[14:12],inst[31:25],alucotrol_wire,immtype_wire,wen_wire);
-  ysyx_23060286_Alu ALU(rs1data_wire,rs2data_wire,immext_wire,pc_wire,alucotrol_wire,rddata_wire,jump_wire,branch_wire,zero_wire);
-  ysyx_23060286_Imm IMM(inst[31:7],immtype_wire,immext_wire);
+	ysyx_23060286_Alu ALU(srca_wire,srcb_wire,alucontrol,zero,aluresult_wire);
+  ysyx_23060286_Srcamux SRCA(rs1data_wire,pc_wire,auipc,srca_wire);
+  ysyx_23060286_Alumux ALUMUX(rs2data_wire,immext_wire,alusrc,srcb_wire);
+  ysyx_23060286_Dnpc DNPC(pc_wire,immext_wire,rs1data_wire,jalr,dnpc_wire);
+  ysyx_23060286_Idu IDU(inst_wire[6:0],inst_wire[14:12],inst_wire[30],zero,jalr,pcsrc,resultsrc,memwrite,alucontrol,alusrc,immsrc,regwrite,auipc);
+  ysyx_23060286_Imm Imm(inst_wire[31:7],auipc,immsrc,immext_wire);
+  ysyx_23060286_Pc PC(clk,rst,npc_wire,pc_wire);
+  ysyx_23060286_Pcmux PCMUX(snpc_wire,dnpc_wire,pcsrc,npc_wire);
+  ysyx_23060286_RegisterFile GRP(clk,result_wire,inst_wire[11:7],inst_wire[19:15],inst_wire[24:20],regwrite,rs1data_wire,rs2data_wire);
+  ysyx_23060286_Resultmux RESMUX(aluresult_wire,readdata_wire,snpc_wire,resultsrc,result_wire);
+  ysyx_23060286_Snpc SNPC(pc_wire,snpc_wire);
 endmodule

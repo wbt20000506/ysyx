@@ -1,118 +1,69 @@
 module ysyx_23060286_Idu (
     input [6:0] op,
     input [2:0] f3,
-    input [6:0] f7,
-    output [2:0] alucontrol,
-    output [1:0] immtype,    
-    output regwrite 
+    input f7,
+    input zero,
+    output jalr,
+    output reg pcsrc,
+    output reg [1:0] resultsrc,
+    output reg memwrite,
+    output reg [2:0] alucontrol,
+    output reg alusrc,
+    output reg [1:0] immsrc,
+    output reg regwrite,
+    output reg auipc
 );
-    import "DPI-C"  function void npc_trap;
+    reg branch;
+    reg [1:0] aluop;
+    reg jump;
+    assign jalr=(immsrc==2'b00)&jump;
+    assign pcsrc=(zero&branch)|jump;
+    import "DPI-C"  function void npc_error;   
+  always @(*) begin
+    /* verilator lint_off CASEINCOMPLETE */
+    case (op)
+        7'd3:begin regwrite=1;immsrc=2'b00;alusrc=1;memwrite=0;resultsrc=2'b01;branch=0;aluop=2'b00;jump=0;auipc=0; end //lw
+        7'd35:begin regwrite=0;immsrc=2'b01;alusrc=1;memwrite=1;resultsrc=2'b01;branch=0;aluop=2'b00;jump=0; auipc=0;end //sw
+        7'd51:begin regwrite=1;immsrc=2'b00;alusrc=0;memwrite=0;resultsrc=2'b00;branch=0;aluop=2'b10;jump=0; auipc=0;end //R-type
+        7'd99:begin regwrite=0;immsrc=2'b10;alusrc=0;memwrite=0;resultsrc=2'b01;branch=1;aluop=2'b01;jump=0; auipc=0;end //beq
+        7'd19:begin regwrite=1;immsrc=2'b00;alusrc=1;memwrite=0;resultsrc=2'b00;branch=0;aluop=2'b10;jump=0; auipc=0;end //I-type
+        7'd111:begin regwrite=1;immsrc=2'b11;alusrc=1;memwrite=0;resultsrc=2'b10;branch=0;aluop=2'b00;jump=1; auipc=0;end //jal
+        7'd103:begin regwrite=1;immsrc=2'b00;alusrc=1;memwrite=0;resultsrc=2'b10;branch=0;aluop=2'b00;jump=1; auipc=0;end //jalr
+        7'd23:begin regwrite=1;immsrc=2'b00;alusrc=1;memwrite=0;resultsrc=2'b00;branch=0;aluop=2'b11;jump=0; auipc=1;end //auipc
+        default:begin npc_error(); regwrite=1;immsrc=2'b00;alusrc=1;memwrite=0;resultsrc=2'b10;branch=0;aluop=2'b00;jump=1;auipc=1;end //error
+    endcase
+    /* verilator lint_off CASEINCOMPLETE */
+  end 
 
-    //001-U 010-J 011-B 100-I 101-S 110-R 111-Special 000-dafult
-    ysyx_23060286_MuxKeyInternal #(
-        .NR_KEY(11), 
-        .KEY_LEN(7), 
-        .DATA_LEN(3), 
-        .HAS_DEFAULT(1)
-    ) opmux (
-        .out(immtype),
-        .key(op),
-        .default_out({3{1'b1}}),  
-        .lut({
-            {7'b0110111, 3'b001},
-            {7'b0010111, 3'b001},
-            {7'b1101111, 3'b010},
-            {7'b1100111, 3'b010},
-            {7'b1100011, 3'b011},
-            {7'b0000011, 3'b100},
-            {7'b0010011, 3'b100},
-            {7'b0100011, 3'b101},
-            {7'b0110011, 3'b110},
-            {7'b0001111, 3'b111},
-            {7'b1110011, 3'b100}
-        })
-    );
+  always @(*) begin
+    /* verilator lint_off CASEINCOMPLETE */
+    case (aluop)
+        2'b00:alucontrol=3'b000; //lw,sw
+        2'b01:alucontrol=3'b001;    //beq
+        2'b10:begin
+            /* verilator lint_off CASEINCOMPLETE */
+            case (f3)
+                3'b111:alucontrol=3'b010;   //and
+                3'b110:alucontrol=3'b011;   //or
+                3'b010:alucontrol=3'b101;   //slt
+                3'b000:begin 
+                        if ({op[5],f7}==2'b11)
+                            alucontrol=3'b001;  //sub
+                        else
+                            alucontrol=3'b000;  //add
+                    end
+            endcase
+            /* verilator lint_off CASEINCOMPLETE */
+        end
+        2'b11:alucontrol=3'b100; //auipc
+    endcase
+    /* verilator lint_off CASEINCOMPLETE */
 
-    // 定义多路选择器处理 ALU 控制信号
-    ysyx_23060286_MuxKeyInternal #(47, 17, 6, 1) aluctrl_mux(
-        .out(alucotrol), 
-        .key({op,f3,f7}), 
-        .default_out(6'b111111),
-        .lut({
-            {17'b0110111_???_???????, 6'd0},  // lui
-            {17'b0010111_???_???????, 6'd1},  // auipc
-            {17'b1101111_???_???????, 6'd2},  // jal
-            {17'b1100111_000_???????, 6'd3},  // jalr
-            {17'b1100011_000_???????, 6'd4},  // beq
-            {17'b1100011_001_???????, 6'd5},  // bne
-            {17'b1100011_100_???????, 6'd6},  // blt
-            {17'b1100011_101_???????, 6'd7},  // bge
-            {17'b1100011_110_???????, 6'd8},  // bltu
-            {17'b1100011_111_???????, 6'd9},  // bgeu
-            {17'b0000011_000_???????, 6'd10}, // lb
-            {17'b0000011_001_???????, 6'd11}, // lh
-            {17'b0000011_010_???????, 6'd12}, // lw
-            {17'b0000011_100_???????, 6'd13}, // lbu
-            {17'b0000011_101_???????, 6'd14}, // lhu
-            {17'b0100011_000_???????, 6'd15}, // sb
-            {17'b0100011_001_???????, 6'd16}, // sh
-            {17'b0100011_010_???????, 6'd17}, // sw
-            {17'b0010011_000_???????, 6'd18}, // addi
-            {17'b0010011_010_???????, 6'd19}, // slti
-            {17'b0010011_011_???????, 6'd20}, // sltiu
-            {17'b0010011_100_???????, 6'd21}, // xori
-            {17'b0010011_110_???????, 6'd22}, // ori
-            {17'b0010011_111_???????, 6'd23}, // andi
-            {17'b0010011_001_0000000, 6'd24}, // slli
-            {17'b0010011_101_0000000, 6'd25}, // srli
-            {17'b0010011_101_0100000, 6'd26}, // srai
-            {17'b0110011_000_0000000, 6'd27}, // add
-            {17'b0110011_000_0100000, 6'd28}, // sub
-            {17'b0110011_001_0000000, 6'd29}, // sll
-            {17'b0110011_010_0000000, 6'd30}, // slt
-            {17'b0110011_011_0000000, 6'd31}, // sltu
-            {17'b0110011_100_0000000, 6'd32}, // xor
-            {17'b0110011_101_0000000, 6'd33}, // srl
-            {17'b0110011_101_0100000, 6'd34}, // sra
-            {17'b0110011_110_0000000, 6'd35}, // or
-            {17'b0110011_111_0000000, 6'd36}, // and
-            {17'b0001111_000_0000000, 6'd37}, // fence
-            {17'b0001111_001_0000000, 6'd38}, // fence.i
-            {17'b1110011_000_0000000, 6'd39}, // ecall
-            {17'b1110011_000_0000001, 6'd40}, // ebreak
-            {17'b1110011_001_???????, 6'd41}, // csrrw
-            {17'b1110011_010_???????, 6'd42}, // csrrs
-            {17'b1110011_011_???????, 6'd43}, // csrrc
-            {17'b1110011_101_???????, 6'd44}, // csrrwi
-            {17'b1110011_110_???????, 6'd45}, // csrrsi
-            {17'b1110011_111_???????, 6'd46} // csrrci
-        })
-    );
-
-    // 定义多路选择器处理 regwrite 信号
-    ysyx_23060286_MuxKeyInternal #(8, 7, 1, 1) regwrite_mux(
-        .out(regwrite), 
-        .key(op), 
-        .default_out(1'b0), // 默认值设置为0，表示不需要写回寄存器
-        .lut({
-            // regwrite 信号配置
-            {7'b0110011, 1'b1}, // R-Type (通常需要写回寄存器)
-            {7'b0010011, 1'b1}, // I-Type (算术逻辑指令通常需要写回寄存器)
-            {7'b0000011, 1'b1}, // Load指令（需要写回寄存器）
-            {7'b1101111, 1'b1}, // JAL (需要写回寄存器)
-            {7'b1100111, 1'b1},  // JALR (需要写回寄存器)
-            {7'b0110111, 1'b1},  //LUI
-            {7'b0010111, 1'b1},  //AUIPC
-            {7'b1110011, 1'b1}  //ci
-            // 其他指令默认不写回，如存储指令、分支指令等
-        })
-    );
-
-
+  end
+    
+    import "DPI-C"  function void npc_trap;   
     always @(*) begin
-        if(op==7'b11)begin
+        if(op==7'b1110011)
             npc_trap();
-        end        
     end
-
 endmodule

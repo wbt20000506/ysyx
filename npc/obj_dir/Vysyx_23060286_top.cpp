@@ -13,26 +13,37 @@ Vysyx_23060286_top::Vysyx_23060286_top(sc_module_name /* unused */)
     : vlSymsp{new Vysyx_23060286_top__Syms(nullptr, name(), this)}
     , clk{vlSymsp->TOP.clk}
     , rst{vlSymsp->TOP.rst}
-    , wen_wire{vlSymsp->TOP.wen_wire}
-    , alucotrol_wire{vlSymsp->TOP.alucotrol_wire}
-    , immtype_wire{vlSymsp->TOP.immtype_wire}
-    , branch_wire{vlSymsp->TOP.branch_wire}
-    , zero_wire{vlSymsp->TOP.zero_wire}
-    , jump_wire{vlSymsp->TOP.jump_wire}
-    , pc_wire{vlSymsp->TOP.pc_wire}
-    , rddata_wire{vlSymsp->TOP.rddata_wire}
-    , immext_wire{vlSymsp->TOP.immext_wire}
-    , rs1data_wire{vlSymsp->TOP.rs1data_wire}
-    , inst{vlSymsp->TOP.inst}
-    , rs2data_wire{vlSymsp->TOP.rs2data_wire}
+    , pcsrc{vlSymsp->TOP.pcsrc}
+    , memwrite{vlSymsp->TOP.memwrite}
+    , alusrc{vlSymsp->TOP.alusrc}
+    , regwrite{vlSymsp->TOP.regwrite}
+    , zero{vlSymsp->TOP.zero}
+    , jalr{vlSymsp->TOP.jalr}
+    , auipc{vlSymsp->TOP.auipc}
+    , resultsrc{vlSymsp->TOP.resultsrc}
+    , immsrc{vlSymsp->TOP.immsrc}
+    , alucontrol{vlSymsp->TOP.alucontrol}
+    , inst_wire{vlSymsp->TOP.inst_wire}
+    , readdata_wire{vlSymsp->TOP.readdata_wire}
     , npc_wire{vlSymsp->TOP.npc_wire}
+    , pc_wire{vlSymsp->TOP.pc_wire}
+    , snpc_wire{vlSymsp->TOP.snpc_wire}
+    , rs1data_wire{vlSymsp->TOP.rs1data_wire}
+    , rs2data_wire{vlSymsp->TOP.rs2data_wire}
+    , immext_wire{vlSymsp->TOP.immext_wire}
+    , srcb_wire{vlSymsp->TOP.srcb_wire}
+    , aluresult_wire{vlSymsp->TOP.aluresult_wire}
+    , dnpc_wire{vlSymsp->TOP.dnpc_wire}
+    , result_wire{vlSymsp->TOP.result_wire}
+    , srca_wire{vlSymsp->TOP.srca_wire}
     , rootp{&(vlSymsp->TOP)}
 {
     // Sensitivities on all clocks and combinational inputs
     SC_METHOD(eval);
     sensitive << clk;
     sensitive << rst;
-    sensitive << inst;
+    sensitive << inst_wire;
+    sensitive << readdata_wire;
 
 }
 

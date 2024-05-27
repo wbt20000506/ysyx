@@ -30,19 +30,29 @@ SC_MODULE(Vysyx_23060286_top) {
     // propagate new values into/out from the Verilated model.
     sc_in<bool> &clk;
     sc_in<bool> &rst;
-    sc_out<bool> &wen_wire;
-    sc_out<uint32_t> &alucotrol_wire;
-    sc_out<uint32_t> &immtype_wire;
-    sc_out<bool> &branch_wire;
-    sc_out<bool> &zero_wire;
-    sc_out<bool> &jump_wire;
-    sc_out<uint32_t> &pc_wire;
-    sc_out<uint32_t> &rddata_wire;
-    sc_out<uint32_t> &immext_wire;
-    sc_out<uint32_t> &rs1data_wire;
-    sc_in<uint32_t> &inst;
-    sc_out<uint32_t> &rs2data_wire;
+    sc_out<bool> &pcsrc;
+    sc_out<bool> &memwrite;
+    sc_out<bool> &alusrc;
+    sc_out<bool> &regwrite;
+    sc_out<bool> &zero;
+    sc_out<bool> &jalr;
+    sc_out<bool> &auipc;
+    sc_out<uint32_t> &resultsrc;
+    sc_out<uint32_t> &immsrc;
+    sc_out<uint32_t> &alucontrol;
+    sc_in<uint32_t> &inst_wire;
+    sc_in<uint32_t> &readdata_wire;
     sc_out<uint32_t> &npc_wire;
+    sc_out<uint32_t> &pc_wire;
+    sc_out<uint32_t> &snpc_wire;
+    sc_out<uint32_t> &rs1data_wire;
+    sc_out<uint32_t> &rs2data_wire;
+    sc_out<uint32_t> &immext_wire;
+    sc_out<uint32_t> &srcb_wire;
+    sc_out<uint32_t> &aluresult_wire;
+    sc_out<uint32_t> &dnpc_wire;
+    sc_out<uint32_t> &result_wire;
+    sc_out<uint32_t> &srca_wire;
 
     // CELLS
     // Public to allow access to /* verilator public */ items.

@@ -1,29 +1,19 @@
 module ysyx_23060286_Imm (
-    /* verilator lint_off UNUSED */
-    input [31:7] inst,
-    /* verilator lint_off UNUSED */
-    input [2:0] immtype,
-    output [31:0] immext
+    input [31:7] imm,
+    input auipc,
+    input [1:0] immsrc,
+    output reg [31:0] immext  
 );
-    // 定义各种类型的立即数
-    wire [31:0] immI = {{20{inst[31]}}, inst[31:20]};
-    wire [31:0] immS = {{20{inst[31]}}, inst[31:25], inst[11:7]};
-    wire [31:0] immB = {{19{inst[31]}}, inst[31], inst[7], inst[30:25], inst[11:8], 1'b0};
-    wire [31:0] immU = {inst[31:12], 12'b0};
-    wire [31:0] immJ = {{11{inst[31]}}, inst[31], inst[19:12], inst[20], inst[30:21], 1'b0};
-
-    ysyx_23060286_MuxKeyInternal #(5, 3, 32, 1) imm_mux(
-        .out(immext), 
-        .key(immtype), 
-        .default_out(32'b0),
-        .lut({
-            {3'b100, immI},  // I-Type
-            {3'b101, immS},  // S-Type
-            {3'b011, immB},  // B-Type
-            {3'b001, immU},  // U-Type
-            {3'b010, immJ}   // J-Type
-        })
-    );
-
+    always @(*) begin
+        case ({immsrc,auipc})
+            3'b000: immext = {{20{imm[31]}}, imm[31:20]}; // I-type
+            3'b010: immext = {{20{imm[31]}}, imm[31:25], imm[11:7]}; // S-type
+            3'b100: immext = {{19{imm[31]}}, imm[31], imm[7], imm[30:25], imm[11:8], 1'b0}; // B-type
+            3'b110: immext = {{12{imm[31]}}, imm[19:12], imm[20], imm[30:21], 1'b0}; // J-type
+            3'b001: immext = {{imm[31:12]},{12{1'b0}}}; // U-type
+            default: immext = {32{1'b1}};
+        endcase
+    end
 endmodule
+
 
