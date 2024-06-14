@@ -1,11 +1,13 @@
 VSRC = $(wildcard ./vsrc/*.v)
-CSRC = $(wildcard ./csrc/sc_main.cpp)
+CSRC = $(wildcard ./csrc/*.cpp)
+MODE = sdb
 
 all:$(CSRC) $(VSRC)
-	verilator --sc --trace --exe -Wall --top-module top $(CSRC) $(VSRC)
-	make -j -C obj_dir -f Vtop.mk Vtop
-	obj_dir/Vtop
-
+	verilator --sc --trace --exe -Wall --public-flat-rw --top-module ysyx_23060286_top $(CSRC) $(VSRC) -CFLAGS "-I/usr/include/readline -I/usr/lib/llvm-11/include -fPIE" -LDFLAGS "-L/usr/lib/readline -lreadline -lLLVM-11 -lelf "
+	make -j -C obj_dir -f Vysyx_23060286_top.mk Vysyx_23060286_top
+	obj_dir/Vysyx_23060286_top $(IMG) $(MODE) 
+	#gtkwave wave.vcd
+	
 sim:$(CSRC) $(VSRC)
 	$(call git_commit, "sim RTL")
 	verilator --sc --trace --exe -Wall --top-module top $(CSRC) $(VSRC)

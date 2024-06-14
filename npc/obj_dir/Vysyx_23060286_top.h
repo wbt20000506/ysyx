@@ -5,23 +5,23 @@
 // The class here is then constructed to instantiate the design.
 // See the Verilator manual for examples.
 
-#ifndef VERILATED_VTOP_H_
-#define VERILATED_VTOP_H_  // guard
+#ifndef VERILATED_VYSYX_23060286_TOP_H_
+#define VERILATED_VYSYX_23060286_TOP_H_  // guard
 
 #include "systemc.h"
 #include "verilated_sc.h"
 #include "verilated.h"
 #include "svdpi.h"
 
-class Vtop__Syms;
-class Vtop___024root;
+class Vysyx_23060286_top__Syms;
+class Vysyx_23060286_top___024root;
 class VerilatedVcdSc;
 
 // This class is the main interface to the Verilated model
-SC_MODULE(Vtop) {
+SC_MODULE(Vysyx_23060286_top) {
   private:
     // Symbol table holding complete model state (owned by this class)
-    Vtop__Syms* const vlSymsp;
+    Vysyx_23060286_top__Syms* const vlSymsp;
 
   public:
 
@@ -30,19 +30,29 @@ SC_MODULE(Vtop) {
     // propagate new values into/out from the Verilated model.
     sc_in<bool> &clk;
     sc_in<bool> &rst;
-    sc_out<bool> &wen_wire;
-    sc_out<uint32_t> &alucotrol_wire;
-    sc_out<uint32_t> &immtype_wire;
-    sc_out<bool> &of_wire;
-    sc_out<bool> &zf_wire;
-    sc_out<bool> &nf_wire;
-    sc_out<bool> &cf_wire;
+    sc_out<bool> &pcsrc;
+    sc_out<bool> &alusrc;
+    sc_out<bool> &regwrite;
+    sc_out<bool> &zero;
+    sc_out<bool> &jalr;
+    sc_out<bool> &auipc;
+    sc_out<uint32_t> &resultsrc;
+    sc_out<uint32_t> &immsrc;
+    sc_out<uint32_t> &memwrite;
+    sc_out<uint32_t> &alucontrol;
+    sc_in<uint32_t> &inst_wire;
+    sc_in<uint32_t> &readdata_wire;
+    sc_out<uint32_t> &npc_wire;
     sc_out<uint32_t> &pc_wire;
-    sc_out<uint32_t> &rddata_wire;
-    sc_out<uint32_t> &immext_wire;
+    sc_out<uint32_t> &snpc_wire;
     sc_out<uint32_t> &rs1data_wire;
-    sc_in<uint32_t> &inst;
     sc_out<uint32_t> &rs2data_wire;
+    sc_out<uint32_t> &immext_wire;
+    sc_out<uint32_t> &srcb_wire;
+    sc_out<uint32_t> &aluresult_wire;
+    sc_out<uint32_t> &dnpc_wire;
+    sc_out<uint32_t> &result_wire;
+    sc_out<uint32_t> &srca_wire;
 
     // CELLS
     // Public to allow access to /* verilator public */ items.
@@ -50,13 +60,13 @@ SC_MODULE(Vtop) {
 
     // Root instance pointer to allow access to model internals,
     // including inlined /* verilator public_flat_* */ items.
-    Vtop___024root* const rootp;
+    Vysyx_23060286_top___024root* const rootp;
 
     // CONSTRUCTORS
-    SC_CTOR(Vtop);
-    virtual ~Vtop();
+    SC_CTOR(Vysyx_23060286_top);
+    virtual ~Vysyx_23060286_top();
   private:
-    VL_UNCOPYABLE(Vtop);  ///< Copying not allowed
+    VL_UNCOPYABLE(Vysyx_23060286_top);  ///< Copying not allowed
 
   public:
     // API METHODS

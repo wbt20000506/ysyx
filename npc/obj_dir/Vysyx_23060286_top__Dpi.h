@@ -5,8 +5,8 @@
 // Manually include this file where DPI .c import functions are declared to ensure
 // the C functions match the expectations of the DPI imports.
 
-#ifndef VERILATED_VTOP__DPI_H_
-#define VERILATED_VTOP__DPI_H_  // guard
+#ifndef VERILATED_VYSYX_23060286_TOP__DPI_H_
+#define VERILATED_VYSYX_23060286_TOP__DPI_H_  // guard
 
 #include "svdpi.h"
 
@@ -16,7 +16,9 @@ extern "C" {
 
 
     // DPI IMPORTS
-    // DPI import at vsrc/Idu.v:14:35
+    // DPI import at vsrc/ysyx_23060286_Idu.v:21:35
+    extern void npc_error();
+    // DPI import at vsrc/ysyx_23060286_Idu.v:22:35
     extern void npc_trap();
 
 #ifdef __cplusplus
