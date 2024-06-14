@@ -6,11 +6,12 @@ module ysyx_23060286_top (
   /* verilator lint_off UNDRIVEN */
   input [31:0] readdata_wire,
   output [31:0] npc_wire,pc_wire,snpc_wire,rs1data_wire,rs2data_wire,immext_wire,srcb_wire,aluresult_wire,dnpc_wire,result_wire,srca_wire,
-  output pcsrc,memwrite,alusrc,regwrite,zero,jalr,auipc,
+  output pcsrc,alusrc,regwrite,zero,jalr,auipc,
   output [1:0] resultsrc,immsrc,
-  output [2:0] alucontrol
+  output [3:0] memwrite,
+  output [3:0] alucontrol
 );
-	ysyx_23060286_Alu ALU(srca_wire,srcb_wire,alucontrol,zero,aluresult_wire);
+	ysyx_23060286_Alu ALU(srca_wire,srcb_wire,alucontrol,inst_wire[14:12],zero,aluresult_wire);
   ysyx_23060286_Srcamux SRCA(rs1data_wire,pc_wire,auipc,srca_wire);
   ysyx_23060286_Alumux ALUMUX(rs2data_wire,immext_wire,alusrc,srcb_wire);
   ysyx_23060286_Dnpc DNPC(pc_wire,immext_wire,rs1data_wire,jalr,dnpc_wire);

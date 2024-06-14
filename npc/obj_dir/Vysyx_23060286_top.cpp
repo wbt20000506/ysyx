@@ -14,7 +14,6 @@ Vysyx_23060286_top::Vysyx_23060286_top(sc_module_name /* unused */)
     , clk{vlSymsp->TOP.clk}
     , rst{vlSymsp->TOP.rst}
     , pcsrc{vlSymsp->TOP.pcsrc}
-    , memwrite{vlSymsp->TOP.memwrite}
     , alusrc{vlSymsp->TOP.alusrc}
     , regwrite{vlSymsp->TOP.regwrite}
     , zero{vlSymsp->TOP.zero}
@@ -22,6 +21,7 @@ Vysyx_23060286_top::Vysyx_23060286_top(sc_module_name /* unused */)
     , auipc{vlSymsp->TOP.auipc}
     , resultsrc{vlSymsp->TOP.resultsrc}
     , immsrc{vlSymsp->TOP.immsrc}
+    , memwrite{vlSymsp->TOP.memwrite}
     , alucontrol{vlSymsp->TOP.alucontrol}
     , inst_wire{vlSymsp->TOP.inst_wire}
     , readdata_wire{vlSymsp->TOP.readdata_wire}

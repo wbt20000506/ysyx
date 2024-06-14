@@ -31,7 +31,6 @@ SC_MODULE(Vysyx_23060286_top) {
     sc_in<bool> &clk;
     sc_in<bool> &rst;
     sc_out<bool> &pcsrc;
-    sc_out<bool> &memwrite;
     sc_out<bool> &alusrc;
     sc_out<bool> &regwrite;
     sc_out<bool> &zero;
@@ -39,6 +38,7 @@ SC_MODULE(Vysyx_23060286_top) {
     sc_out<bool> &auipc;
     sc_out<uint32_t> &resultsrc;
     sc_out<uint32_t> &immsrc;
+    sc_out<uint32_t> &memwrite;
     sc_out<uint32_t> &alucontrol;
     sc_in<uint32_t> &inst_wire;
     sc_in<uint32_t> &readdata_wire;

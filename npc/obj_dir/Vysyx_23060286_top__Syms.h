@@ -32,6 +32,21 @@ class Vysyx_23060286_top__Syms final : public VerilatedSyms {
     // MODULE INSTANCE STATE
     Vysyx_23060286_top___024root   TOP;
 
+    // SCOPE NAMES
+    VerilatedScope __Vscope_TOP;
+    VerilatedScope __Vscope_ysyx_23060286_top;
+    VerilatedScope __Vscope_ysyx_23060286_top__ALU;
+    VerilatedScope __Vscope_ysyx_23060286_top__ALUMUX;
+    VerilatedScope __Vscope_ysyx_23060286_top__DNPC;
+    VerilatedScope __Vscope_ysyx_23060286_top__GRP;
+    VerilatedScope __Vscope_ysyx_23060286_top__IDU;
+    VerilatedScope __Vscope_ysyx_23060286_top__Imm;
+    VerilatedScope __Vscope_ysyx_23060286_top__PC;
+    VerilatedScope __Vscope_ysyx_23060286_top__PCMUX;
+    VerilatedScope __Vscope_ysyx_23060286_top__RESMUX;
+    VerilatedScope __Vscope_ysyx_23060286_top__SNPC;
+    VerilatedScope __Vscope_ysyx_23060286_top__SRCA;
+
     // CONSTRUCTORS
     Vysyx_23060286_top__Syms(VerilatedContext* contextp, const char* namep, Vysyx_23060286_top* modelp);
     ~Vysyx_23060286_top__Syms();

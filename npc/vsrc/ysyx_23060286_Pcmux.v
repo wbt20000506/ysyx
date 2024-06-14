@@ -5,4 +5,5 @@ module ysyx_23060286_Pcmux (
     output [31:0] next_pc
 );
     assign next_pc=(pcsrc ? dnpc:snpc);
+
 endmodule

@@ -18,7 +18,7 @@ extern "C" {
     // DPI IMPORTS
     // DPI import at vsrc/ysyx_23060286_Idu.v:21:35
     extern void npc_error();
-    // DPI import at vsrc/ysyx_23060286_Idu.v:64:35
+    // DPI import at vsrc/ysyx_23060286_Idu.v:22:35
     extern void npc_trap();
 
 #ifdef __cplusplus

@@ -8,7 +8,7 @@ module ysyx_23060286_RegisterFile(
   output [31:0] rs1data,
   output [31:0] rs2data
 );
-    reg [31:0] rf [31:0];
+    reg [31:0] rf [31:0] /*verilator public_flat_rd*/;
     assign rs1data=rf[r1addr];
     assign rs2data=rf[r2addr];
     always @(posedge clk) begin
@@ -16,3 +16,4 @@ module ysyx_23060286_RegisterFile(
         rf[0]<=32'd0;
     end
 endmodule
+
