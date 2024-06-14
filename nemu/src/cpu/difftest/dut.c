@@ -96,6 +96,16 @@ static void checkregs(CPU_state *ref, vaddr_t pc) {
     nemu_state.state = NEMU_ABORT;
     nemu_state.halt_pc = pc;
     isa_reg_display();
+    int count=0;
+    for (int i = 0; i < 32; i++){
+    printf("%d=0x%08x\t",i,ref->gpr[i]);
+    count++;
+    if (count==3 || i==31)
+    {
+      printf("\n");
+      count=0;
+    }  
+  }
   }
 }
 

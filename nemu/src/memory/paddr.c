@@ -53,7 +53,7 @@ void init_mem() {
 word_t paddr_read(paddr_t addr, int len) {
   if (likely(in_pmem(addr))){ 
     #if defined(CONFIG_MTRACE)
-      printf("%d:  read  %8x in 0x%8x\n",num,pmem_read(addr, len),addr);
+      printf("%d:  read  %08x in %08x\n",num,pmem_read(addr, len),addr);
       num++;
     #endif
     return pmem_read(addr, len);

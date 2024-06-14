@@ -19,6 +19,7 @@
  * Type 'man regex' for more information about POSIX regex functions.
  */
 #include <regex.h>
+
 bool check_parentheses(int p, int q);
 int find(int p, int q);
 word_t eval(int p, int q, bool *success);

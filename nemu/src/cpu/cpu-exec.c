@@ -29,7 +29,9 @@ CPU_state cpu = {};
 uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
-static char *p_inst=NULL; 
+
+static char *p_inst __attribute__((used)) =NULL; 
+
 //static int block_nun=1;
 char *load_elf_symbols(const char* elf_path,const uint32_t addr);
 typedef struct {
@@ -39,7 +41,7 @@ typedef struct {
 } RingBuffer;
 
 RingBuffer rb = { .rhead = 0, .rtail = 0 };
-
+static void writeRingbuffer(RingBuffer *rb, const char *prb) __attribute__((used));
 static void writeRingbuffer(RingBuffer *rb, const char *prb) {
     strncpy(rb->rbuffer[rb->rhead], prb, 255);  // 复制字符串到环形缓冲区
     rb->rhead = (rb->rhead + 1) % 10;  // 环形递增头指针
@@ -47,7 +49,7 @@ static void writeRingbuffer(RingBuffer *rb, const char *prb) {
         rb->rtail = (rb->rtail + 1) % 10;
     }
 }
-
+static void printRingbuffer(const RingBuffer *rb) __attribute__((used));
 static void printRingbuffer(const RingBuffer *rb) {
     int current = rb->rtail;
     do {
@@ -125,7 +127,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
 #else
   p[0] = '\0'; // the upstream llvm does not support loongarch32r
 #endif
-#endif
+
   p_inst=p;
 #ifdef CONFIG_FTRACE
   ftace(*p,s->pc,s->isa.inst.val,s->dnpc);
@@ -133,7 +135,8 @@ static void exec_once(Decode *s, vaddr_t pc) {
   char prb[100];
   memset(prb,' ',100);
   sprintf(prb,"    0x%08x: %08x      %s",s->pc,s->isa.inst.val,p_inst);
-  writeRingbuffer(&rb,prb);  
+  writeRingbuffer(&rb,prb);
+#endif  
 }
 
 static void execute(uint64_t n) {
@@ -142,6 +145,7 @@ static void execute(uint64_t n) {
     exec_once(&s, cpu.pc);
     g_nr_guest_inst ++;
     trace_and_difftest(&s, cpu.pc);
+    #ifdef CONFIG_ITRACE
     if (nemu_state.state != NEMU_RUNNING){
       if (s.isa.inst.val!=0x00100073)
       {
@@ -149,6 +153,7 @@ static void execute(uint64_t n) {
         printf("--> 0x%08x: %08x      %s\n",s.pc,s.isa.inst.val,p_inst);
       }
       break;}
+    #endif
     IFDEF(CONFIG_DEVICE, device_update());
   }
 }
