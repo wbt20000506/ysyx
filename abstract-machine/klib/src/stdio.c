@@ -43,12 +43,52 @@ int intTostr(int num, char *str){
     str[i]='\0';
     reverse(str);
     return i;
-
 }
 
 int printf(const char *fmt, ...) {
-  panic("Not implemented");
+    va_list ap;
+    va_start(ap, fmt);
+    while (*fmt != '\0') {
+        if (*fmt == '%') {
+            fmt++;
+            switch (*fmt) {
+            case 'd': {
+                int a = va_arg(ap, int);
+                char c[100];
+                int n = intTostr(a, c);
+                int m=0;
+                while (m!=n)
+                {
+                  putch(c[m++]);
+                }
+                break;
+            }
+            case 's': {
+                char *s = va_arg(ap, char*);
+                while (*s!='\0')
+                {
+                  putch(*(s++));
+                }
+                break;
+            }
+            case 'c': {
+                char c = (char)va_arg(ap, int);
+                  putch(c);
+                break;
+            }
+            default:
+                break;
+            }
+            fmt++; // Skip format specifier
+        } else {
+            putch(*fmt);
+            fmt++;
+        }
+    }
+    return 0;
 }
+
+
 
 int vsprintf(char *out, const char *fmt, va_list ap) {
   panic("Not implemented");
