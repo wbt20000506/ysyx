@@ -49,6 +49,17 @@ static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2, word_
   }
 }
 
+static word_t *csr(word_t src2){
+  switch (src2)
+  {
+  case 0x305:return &cpu.mtvec;
+  case 0x300:return &cpu.mstatus;
+  case 0x342:return &cpu.mcause;
+  case 0x341:return &cpu.mepc;
+  default:assert(0);
+  }
+}
+
 static int decode_exec(Decode *s) {
   int rd = 0;
   word_t src1 = 0, src2 = 0, imm = 0;
@@ -111,8 +122,17 @@ static int decode_exec(Decode *s) {
   INSTPAT("0100000 ????? ????? 101 ????? 01100 11", sra    , r, R(rd) = (sword_t)src1 >> (src2&0x0000001f));
   INSTPAT("0000000 ????? ????? 101 ????? 01100 11", srl    , r, R(rd) = src1 >> (src2&0x0000001f));
 
+  INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw  , I, word_t t=*csr(imm);*csr(imm)=src1;R(rd)=t);
+  INSTPAT("??????? ????? ????? 010 ????? 11100 11", csrrs  , I, word_t t=*csr(imm);*csr(imm)=src1|t;R(rd)=t);
+  INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall  , I, s->dnpc=isa_raise_intr(11, s->pc));
+  INSTPAT("0011000 00010 00000 000 00000 11100 11", mret   , r, s->dnpc = cpu.mepc;cpu.mstatus &= (~0x1800));
+
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak , N, NEMUTRAP(s->pc, R(10))); // R(10) is $a0
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv    , N, INV(s->pc));
+
+
+
+
   INSTPAT_END();
   //Log("src1:%08x,src2:%08x,imm:%08x,rd:%08x",src1,src2,imm,R(rd));
   //Log("pc:%08x,inst:%08x",s->pc,s->isa.inst.val);

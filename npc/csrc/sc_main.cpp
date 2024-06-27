@@ -10,6 +10,11 @@
 #include <stdio.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <time.h>
+//#define ftrace
+//#define mtrace
+//#define itrace
+//#define diff
 std::map<uint32_t, uint32_t> data;
 std::map<uint32_t, uint8_t> data_mo;
 sc_signal<uint32_t> pc_wire;
@@ -185,11 +190,13 @@ public:
         }
     }
 
-    void itrace() {
+    void trace() {
         scan_wp();
+        #ifdef diff
         if(!isa_difftest_checkregs()){
             sc_stop();
         }
+        #endif
         char *p = new char[104];
         memset(p,' ',1);
         uint8_t code[4];
@@ -197,10 +204,16 @@ public:
         code[2] = (inst.read()>>16)&0xff;
         code[1] = (inst.read()>>8)&0xff;
         code[0] = inst.read()&0xff;
+        #ifdef itrace
         disassemble(p,104,pc.read(),code,4);
         printf("0x%08x: 0x%08x  %s\n", pc.read(), inst.read(), p);
+        #endif
+        #ifdef ftrace
         ftace(*p,pc.read(),inst.read(),npc_wire.read());
+        #endif
+        #ifdef diff
         diffstpe();
+        #endif
 
     }
 
@@ -209,7 +222,7 @@ public:
         sensitive << pc << rst;
         dont_initialize();
 
-        SC_METHOD(itrace);
+        SC_METHOD(trace);
         sensitive << inst_updated;  // 对 inst_updated 事件敏感
         dont_initialize();
     }
@@ -223,14 +236,15 @@ public:
     sc_out<uint32_t> rd;
     sc_in<uint32_t> wd;
     sc_in<uint32_t> we;
-    
+    uint32_t low=0;
+    uint32_t high=0;
     void update_data()
     {
         if ((we.read()&0x00000001) != true)
         {
             uint32_t temp=0;
             if (a.read() < 0x8fffffff)
-            {            
+            {     
                 if(we.read()==0){
                     temp = (uint32_t)data_mo[a.read()] + (((uint32_t)data_mo[a.read()+1])<<8) + (((uint32_t)data_mo[a.read()+2])<<16) + (((uint32_t)data_mo[a.read()+3])<<24);
                 }
@@ -243,10 +257,25 @@ public:
                 if(we.read()==6){
                     temp=(uint32_t)data_mo[a.read()]+((uint32_t)data_mo[a.read()+1]<<8);
                 }
+                rd.write(temp);
+                #ifdef mtrace
+                if((inst_wire<<26)==0x0c000000)
+                printf("read:0x%08x in 0x%08x\n", temp, a.read());
+                #endif
+            }else if (a.read()==0xa0000048)
+            {
+                time_t now;
+                time(&now);
+                low=(uint32_t)now;
+                high=now>>32;
+                rd.write(low);
+            }else if(a.read()==0xa000004c){
+                time_t now;
+                time(&now);
+                low=(uint32_t)now;
+                high=now>>32;
+                rd.write(high);
             }
-            rd.write(temp);
-            if((inst_wire<<26)==0x0c000000)
-            printf("read:0x%08x in 0x%08x\n", temp, a.read());
         }
         else
         {   
@@ -261,10 +290,17 @@ public:
                 data_mo[a.read()+1] = wd.read()>>8&0xff;
             }
             if(we.read()==7){
-                data_mo[a.read()] = wd.read()&0xff;
+                if(a.read()==0xa00003f8){
+                    putchar(wd.read()&0xff);
+                }else{
+                    data_mo[a.read()] = wd.read()&0xff;
+                    #ifdef mtrace
+                    printf("write:0x%08x in 0x%08x\n", wd.read(), a.read());
+                    #endif
+                }
             }
+            
 
-            printf("write:0x%08x in 0x%08x\n", wd.read(), a.read());
         }
     }
     SC_CTOR(Data_memory)
