@@ -1,6 +1,6 @@
 #include <am.h>
 #include <nemu.h>
-#include <assert.h>
+#include <stdio.h>
 extern char _heap_start;
 int main(const char *args);
 char *hbrk;
@@ -27,7 +27,8 @@ void halt(int code) {
 
 void _trm_init() {
   bench_reset();
+
+
   int ret = main(mainargs);
-  assert(1);
   halt(ret);
 }

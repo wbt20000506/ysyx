@@ -1,4 +1,4 @@
-#HAS_NAVY = 1
+HAS_NAVY = 1
 RAMDISK_FILE = build/ramdisk.img
 
 NAME = nanos-lite
@@ -8,7 +8,7 @@ include $(AM_HOME)/Makefile
 ifeq ($(ARCH),native)
 ISA = am_native
 else
-INC_PATH += include $(NAVY_HOME)/libs/libc/include
+INC_PATH += include $(NAVY_HOME)/libs/libc/include 
 endif
 
 ./src/resources.S: $(RAMDISK_FILE)

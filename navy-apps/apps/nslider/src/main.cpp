@@ -2,7 +2,7 @@
 #include <SDL_bmp.h>
 #include <stdio.h>
 #include <assert.h>
-
+#include <stdlib.h>
 #define W 400
 #define H 300
 
@@ -38,6 +38,7 @@ void prev(int rep) {
 }
 
 void next(int rep) {
+  printf("next\n");
   if (rep == 0) rep = 1;
   cur += rep;
   if (cur >= N) cur = N - 1;
@@ -47,7 +48,6 @@ void next(int rep) {
 int main() {
   SDL_Init(0);
   SDL_Surface *screen = SDL_SetVideoMode(W, H, 32, SDL_HWSURFACE);
-
   int rep = 0, g = 0;
 
   render();
@@ -55,7 +55,7 @@ int main() {
   while (1) {
     SDL_Event e;
     SDL_WaitEvent(&e);
-
+    printf("%d %d\n",e.type,e.key.keysym.sym);
     if (e.type == SDL_KEYDOWN) {
       switch(e.key.keysym.sym) {
         case SDLK_0: rep = rep * 10 + 0; break;
