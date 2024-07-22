@@ -16,7 +16,6 @@
 #include <common.h>
 #include <device/map.h>
 #include <SDL2/SDL.h>
-
 enum {
   reg_freq,
   reg_channels,

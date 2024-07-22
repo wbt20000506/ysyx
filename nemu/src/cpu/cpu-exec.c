@@ -145,15 +145,15 @@ static void execute(uint64_t n) {
     exec_once(&s, cpu.pc);
     g_nr_guest_inst ++;
     trace_and_difftest(&s, cpu.pc);
-    #ifdef CONFIG_ITRACE
     if (nemu_state.state != NEMU_RUNNING){
+      #ifdef CONFIG_ITRACE
       if (s.isa.inst.val!=0x00100073)
       {
         printRingbuffer(&rb);     
         printf("--> 0x%08x: %08x      %s\n",s.pc,s.isa.inst.val,p_inst);
       }
+      #endif
       break;}
-    #endif
     IFDEF(CONFIG_DEVICE, device_update());
   }
 }
@@ -173,6 +173,7 @@ void assert_fail_msg() {
   isa_reg_display();
   statistic();
 }
+#include <SDL2/SDL.h>
 
 /* Simulate how the CPU works. */
 void cpu_exec(uint64_t n) {
@@ -202,5 +203,6 @@ void cpu_exec(uint64_t n) {
           nemu_state.halt_pc);
       // fall through
     case NEMU_QUIT: statistic();
+
   }
 }

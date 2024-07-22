@@ -20,6 +20,7 @@
 #include <memory/paddr.h>
 #include <utils.h>
 #include <difftest-def.h>
+#include "../../isa/riscv32/local-include/reg.h"
 
 void (*ref_difftest_memcpy)(paddr_t addr, void *buf, size_t n, bool direction) = NULL;
 void (*ref_difftest_regcpy)(void *dut, bool direction) = NULL;
@@ -60,6 +61,7 @@ void difftest_skip_dut(int nr_ref, int nr_dut) {
 }
 
 void init_difftest(char *ref_so_file, long img_size, int port) {
+  cpu.mstatus=0x1800;
   assert(ref_so_file != NULL);
 
   void *handle;
@@ -98,7 +100,7 @@ static void checkregs(CPU_state *ref, vaddr_t pc) {
     isa_reg_display();
     int count=0;
     for (int i = 0; i < 32; i++){
-    printf("%d=0x%08x\t",i,ref->gpr[i]);
+    printf("%s=0x%08x\t",reg_name(i),ref->gpr[i]);
     count++;
     if (count==3 || i==31)
     {

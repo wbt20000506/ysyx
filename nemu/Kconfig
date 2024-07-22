@@ -226,4 +226,12 @@ config FTRACE
   bool "Enable ftarce support"
   default y
 
+config DTRACE
+  bool "Enable dtarce support"
+  default y
+
+config ETRACE
+  bool "Enable etarce support"
+  default y
+
 endmenu
